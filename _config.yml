@@ -5,7 +5,7 @@ theme: just-the-docs
 url: https://lumosrobotics.github.io
 
 aux_links:
-  Template Repository: https://github.com/LumosRobot/lumosrobotics.github.io
+  github: https://github.com/LumosRobot/lumos_ws.git
 
 plugins:
   - jekyll-default-layout
