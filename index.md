@@ -3,16 +3,15 @@ title: Home
 layout: home
 ---
 
-This is a *bare-minimum* template to create a Jekyll site that uses the [Just the Docs] theme. You can easily set the created site to be published on [GitHub Pages] – the [README] file explains how to do that, along with other details.
-
-If [Jekyll] is installed on your computer, you can also build and preview the created site *locally*. This lets you test changes before committing them, and avoids waiting for GitHub Pages.[^1] And you will be able to deploy your local build to a different platform than GitHub Pages.
-
-More specifically, the created site:
-
-- uses a gem-based approach, i.e. uses a `Gemfile` and loads the `just-the-docs` gem
-- uses the [GitHub Pages / Actions workflow] to build and publish the site on GitHub Pages
-
-Other than that, you're free to customize sites that you create with this template, however you like. You can easily change the versions of `just-the-docs` and Jekyll it uses, as well as adding further plugins.
+Lumos RL Workspace is a modular reinforcement learning framework for legged locomotion, designed around the Lus and NIX humanoid robots.
+Built on Isaac Lab, it decouples policy development from specific simulators, supporting seamless integration with both Isaac Sim and MuJoCo.
+Key features include:
+- Modularity & Flexibility – controllers are isolated from the simulator core, enabling easy extension and platform switching.
+- Imitation-based Learning – with motion references and adaptive curricula, policies can capture natural, human-like movements.
+- General Interfaces – velocity and style commands, reward terms, and robot-specific modules simplify adaptation to new robots.
+- Evaluation & Benchmarking – standardized tests across terrains, tasks, and styles enable robustness, generalization, and sim-to-real studies.
+In short, Lumos RL Workspace is a simulation-agnostic, extensible platform for advancing locomotion policy research and deployment.
+Using this guide, you will be able to  retarget human motions, train locomotion policies, and deploy them to the Lus2 and Nix1 humanoid robots.
 
 [Browse our documentation][Just the Docs] to learn more about how to use this theme.
 
@@ -33,3 +32,9 @@ If you want to maintain your docs in the `docs` directory of an existing project
 [Jekyll]: https://jekyllrb.com
 [GitHub Pages / Actions workflow]: https://github.blog/changelog/2022-07-27-github-pages-custom-github-actions-workflows-beta/
 [use this template]: https://github.com/just-the-docs/just-the-docs-template/generate
+
+
+
+
+
+
