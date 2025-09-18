@@ -5,10 +5,9 @@ nav_order: 1
 ---
 <div align="center">
   <img src="assets/figures/lus2_in_wrc.gif" alt="Lus2 in World Robot Contest" width="600"/>
-  <p><b>Figure: Lus2 in World Robot Contest</b></p>
 </div>
 
-# Chapter 1. Home
+# Introduction
 Lumos RL Workspace is a modular reinforcement learning framework for legged locomotion, designed around the Lus and NIX humanoid robots.
 Built on Isaac Lab, it decouples policy development from specific simulators, supporting seamless integration with both Isaac Sim and MuJoCo.
 Key features include:
@@ -21,10 +20,10 @@ Using this guide, you will be able to  retarget human motions, train locomotion 
 
 <div align="center">
   <img src="assets/figures/full_pipeline.png" alt="Lus2 full_pipeline" width="600"/>
-  <p><b>Figure: Motion Retargeting and Real-World Deploymentt</b></p>
+  <p><b>Figure: Motion Retargeting and Real-World Deployment</b></p>
 </div>
 
-# Chapter 2.  Projects
+# Projects
 This chapter provides an overview of the two core projects in Lumos RL Workspace.Before diving into the details, the following diagram illustrates the relationship between the main components and their interactions:
 <div align="center">
   <img src="assets/figures/Project_Relationship_Diagram.png" alt="nix urdf" width="600"/>
@@ -38,7 +37,7 @@ Additional documentation will be added here progressively.
 
 
 
-## 2.1 Trajectory Alignment
+## 1. Trajectory Alignment
   from human motions to Lus2 & Nix1
 - Focus: Motion retargeting from human trajectories to Lus2 and Nix1.
 - Provides tools for trajectory alignment and dataset preprocessing.
@@ -50,7 +49,7 @@ Example Result Video: Retargeted human motion trajectory executed on Lus2.
   <p><b>Figure: Comparison of Retargeted Motion (CMU_CMU_13_13_21_poses)</b></p>
 </div>
 
-## 2.2 Policy Training
+## 2. Policy Training
 - Focus: Reinforcement learning–based policy for humanoid robots.
 - Framework: Built on st_gym (Isaac Sim–based environments) and st_rl (RL algorithms).
 - Key Features:

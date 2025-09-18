@@ -5,13 +5,15 @@ nav_enabled: true
 nav_order: 6
 ---
 
-### Algorithms
+# st_rl
 
-#### ppo.py
+## algorithms
 
-#####  General Overview
+### 1.ppo.py
 
-This file implements **PPO (Proximal Policy Optimization)**, a widely used reinforcement learning algorithm. It defines the **PPO class** which manages training with:
+#### General Overview
+
+This file implements **PPO** **(****Proximal Policy Optimization****)**, a widely used reinforcement learning algorithm. It defines the **PPO class** which manages training with:
 
 - A policy/value network (actor_critic).
 - Experience storage (`RolloutStorage`).
@@ -19,11 +21,9 @@ This file implements **PPO (Proximal Policy Optimization)**, a widely used reinf
 
 This is the **foundation**: later, `APPO` extends this base PPO by adding adversarial imitation learning.
 
+#### Class Breakdown
 
-
-##### Class Breakdown
-
-1. ###### Imports and class definition
+###### 1.Imports and class definition
 
 ```Python
 from collections import defaultdict
@@ -58,7 +58,7 @@ class PPO:
 - `RolloutStorage`: handles storing trajectories.
 - Defines the `PPO` class, which will implement the PPO algorithm.
 
-1. ###### Initialization (__init__)
+###### 2.Initialization (__init__)
 
 ```Python
 def __init__(self,
@@ -95,7 +95,7 @@ def __init__(self,
   - `empirical_normalization`: whether to normalize observations.
 - Sets up optimizer and stores other config variables.
 
-1. ###### Observation normalization
+###### 3.Observation normalization
 
 ```Python
 def init_obs_norm(self, num_obs, num_critic_obs):
@@ -112,7 +112,7 @@ def init_obs_norm(self, num_obs, num_critic_obs):
 - If `empirical_normalization=True`: normalize with running statistics.
 - Otherwise: just identity (no normalization).
 
-1. ###### Rollout storage
+###### 4.Rollout storage
 
 ```Python
 def init_storage(self, num_envs, num_transitions_per_env, actor_obs_shape, critic_obs_shape, action_shape, **kwargs):
@@ -123,7 +123,7 @@ def init_storage(self, num_envs, num_transitions_per_env, actor_obs_shape, criti
 - Initializes `RolloutStorage` to hold collected trajectories.
 - Each transition contains: observations, actions, rewards, values, etc.
 
-1. ###### Acting (act)
+###### 5.Acting (act)
 
 ```Python
 def act(self, obs, critic_obs):
@@ -148,7 +148,7 @@ def act(self, obs, critic_obs):
 - Saves both actor observations and critic observations for training later.
 - Return the chosen action to be executed in the environment.
 
-1. ###### Processing environment step (process_env_step)
+###### 6.Processing environment step (process_env_step)
 
 ```Python
 def process_env_step(self, rewards, dones, infos):
@@ -170,7 +170,7 @@ def process_env_step(self, rewards, dones, infos):
 - Clears transition for the next step.
 - Resets the actor-critic if episodes ended.
 
-1. ###### Compute returns (compute_returns)
+###### 7.Compute returns (compute_returns)
 
 ```Python
 def compute_returns(self, last_critic_obs):
@@ -182,7 +182,7 @@ def compute_returns(self, last_critic_obs):
 - Uses the critic’s value for the last observation as a bootstrap.
 - Calls `compute_returns` in `RolloutStorage`, which usually implements GAE (Generalized Advantage Estimation).
 
-1. ###### Update loop (update)
+###### 8.Update loop (update)
 
 ```Python
 def update(self, current_learning_iteration):
@@ -231,7 +231,7 @@ def update(self, current_learning_iteration):
   - Clears storage afterward.
 - Returns average losses and stats for logging.
 
-1. ###### Compute losses (compute_losses)
+###### 9.Compute losses (compute_losses)
 
 ```Python
 def compute_losses(self, minibatch):
@@ -353,7 +353,7 @@ Returns:
 - `surrogate_loss`, `value_loss`, and optionally entropy (as a negative term so lower = more entropy).
 - Intermediate variables (ratios, clipped values, etc.) for analysis/debugging.
 
-1. ###### Save and load state
+###### 10.Save and load state
 
 ```Python
 def state_dict(self):
@@ -402,11 +402,11 @@ def load_state_dict(self, state_dict):
 - Ensures training can resume from saved checkpoints.
 - Prints a warning if scheduler state exists but no scheduler is initialized.
 
-#### 5.2.3.2 appo.py
+### 2.appo.py
 
 #####  General Overview
 
-**This file implements APPO (Adversarial Proximal Policy Optimization), an extension of PPO for adversarial imitation learning.** It defines the APPO-related classes which manage training with:
+**This file implements APPO (Adversarial** **Proximal Policy Optimization****), an extension of** **PPO** **for adversarial imitation learning.** It defines the APPO-related classes which manage training with:
 
 - A base PPO algorithm (for stable policy optimization).
 - Additional rollout storage (`AmpRolloutStorage`) that includes expert reference motions.
@@ -414,7 +414,7 @@ def load_state_dict(self, state_dict):
 - Extra loss terms (mimic loss, discriminator loss) to encourage the policy to imitate expert data.
 - Style rewards combined with task rewards to balance imitation and task completion.
 
-**This extends PPO**: while PPO only optimizes the policy using environment rewards and clipped updates, APPO adds **adversarial motion priors** so the agent learns both to solve the task and to move like an expert.
+**This extends** **PPO**: while PPO only optimizes the policy using environment rewards and clipped updates, APPO adds **adversarial motion priors** so the agent learns both to solve the task and to move like an expert.
 
 **APPO Basics (Reminder)**
 
@@ -447,7 +447,7 @@ def GET_PROB_FUNC(option, iteration_scale):
 
 ##### Class Breakdown
 
-1. ###### Imports and utility function
+###### 1.Imports and utility function
 
 ```Python
  import torch
@@ -471,7 +471,7 @@ from st_rl.modules import EmpiricalNormalization
 - `EmpiricalNormalization`: normalization tool.
 - `AMPLoader`: loads expert motion data for adversarial imitation.
 
-1. ###### `APPOAlgoMixin` (Mixin for adversarial imitation) 
+###### 2.`APPOAlgoMixin` (Mixin for adversarial imitation) 
 
 ```Python
 class APPOAlgoMixin:
@@ -499,7 +499,7 @@ class APPOAlgoMixin:
   - `mimic_loss_coef`: weight for imitation loss.
   - `ref_obs_normalizer` / `ref_motion_normalizer`: normalize expert reference states and motions.
 
-1. ###### Storage initialization
+###### 3.Storage initialization
 
 ```Python
 def init_storage(self, *args, **kwargs):
@@ -510,7 +510,7 @@ def init_storage(self, *args, **kwargs):
 - Initializes storage for AMP rollouts.
 - `AmpRolloutStorage` is similar to normal rollout storage, but it also stores reference motions/observations for adversarial training.
 
-1. ###### Acting (`act` override)
+###### 4.Acting (`act` override)
 
 ```Python
 def act(self, obs, critic_obs):
@@ -523,7 +523,7 @@ def act(self, obs, critic_obs):
 - Saves the chosen actions as action_labels (used later for supervised losses like imitation)
 - Return the actions to execute.
 
-1. ###### Processing environment step
+###### 5.Processing environment step
 
 ```Python
 def process_env_step(self, rewards, dones, infos):
@@ -555,7 +555,7 @@ def process_env_step(self, rewards, dones, infos):
 - Logs both rewards separately.
 - Calls  parent process_env_step to finish storing transition.
 
-1. ###### Compute losses (compute_losses)
+###### 6.Compute losses (compute_losses)
 
 ```Python
 def compute_losses(self, minibatch):
@@ -620,7 +620,7 @@ if hasattr(self.actor_critic, "discriminator"):
   - `grad_pen_loss`: gradient penalty to stabilize training.
   - Adds three losses: expert loss, policy loss, gradient penalty.
 
-1. ###### Return values
+###### 7.Return values
 
 ```Python
 return losses, inter_vars, stats
@@ -628,7 +628,7 @@ return losses, inter_vars, stats
 
 - Returns the extended loss dictionary (PPO losses + imitation/adversarial losses), intermediate variables, and stats.
 
-1. APPO class
+###### 8.APPO class
 
 ```Python
 class APPO(APPOAlgoMixin, PPO):
@@ -646,25 +646,7 @@ class APPO(APPOAlgoMixin, PPO):
   - PPO for stable updates.
   - Mixin for adversarial imitation learning.
 
-1. ######  APPO class
-
-```Python
-class APPO(APPOAlgoMixin, PPO):
-    """
-    APPO (Adversarial Proximal Policy Optimization)
-    Inherits:
-        APPOAlgoMixin: adversarial training features
-        PPO: base PPO algorithm
-    """
-    pass
-```
-
-- `APPO` combines `APPOAlgoMixin` and `PPO`.
-- This is the **standard adversarial PPO**:
-  - PPO for stable updates.
-  - Mixin for adversarial imitation learning.
-
-1. ###### ATPPO class
+###### 9.ATPPO class
 
 ```Python
 class ATPPO(APPOAlgoMixin, TPPO):
@@ -680,11 +662,11 @@ class ATPPO(APPOAlgoMixin, TPPO):
 - `ATPPO` is similar, but instead of PPO it uses `TPPO` (temporal PPO).
 - Suitable when temporal consistency is important (e.g., motion sequences).
 
-#### 5.2.3.3  tppo.py
+### 3.tppo.py
 
 #####  General Overview
 
-**This file implements TPPO (Teacher-guided Proximal Policy Optimization), which extends PPO by introducing a teacher network for distillation.** It defines the `TPPO` class, which manages training with:
+**This file implements TPPO (Teacher-guided** **Proximal Policy Optimization****), which extends** **PPO** **by introducing a teacher network for distillation.** It defines the `TPPO` class, which manages training with:
 
 - A base PPO algorithm (policy optimization with clipped surrogate loss).
 - A **teacher policy network** that provides supervision signals (expert actions, latent embeddings).
@@ -692,14 +674,14 @@ class ATPPO(APPOAlgoMixin, TPPO):
 - A mechanism to probabilistically decide when to use teacher actions vs. student actions during rollouts.
 - Optional learning rate scheduler and hidden-state resampling for recurrent networks.
 
-**TPPO vs PPO**
+**TPPO vs** **PPO**
 
 - PPO: learns only from environment rewards.
 - TPPO: learns both from environment rewards **and** imitation/distillation signals from a teacher.
 
 #####  Utility Functions
 
-###### Utility function: `GET_PROB_FUNC`
+Utility function: `GET_PROB_FUNC`
 
 ```Python
 def GET_PROB_FUNC(option, iteration_scale):
@@ -720,7 +702,7 @@ def GET_PROB_FUNC(option, iteration_scale):
 
 #####  Class Breakdown
 
-1. ###### Initialization
+###### 1.Initialization
 
 ```Python
 class TPPO(PPO):
@@ -757,7 +739,7 @@ class TPPO(PPO):
   - `hidden_state_resample_prob`: random resampling for recurrent hidden states.
   - `action_labels_from_sample`: decides whether teacher actions come from sampling or deterministic inference.
 
-1. ###### Teacher policy setup
+###### 2.Teacher policy setup
 
 ```Python
 teacher_actor_critic = getattr(modules, teacher_policy["class_name"])(**teacher_policy)
@@ -776,7 +758,7 @@ self.teacher_actor_critic.eval()
 - Loads pretrained weights if available.
 - Moves to device (GPU/CPU) and sets to evaluation mode.
 
-1. ######  Storage
+###### 3.Storage
 
 ```Python
 def init_storage(self, *args, **kwargs):
@@ -791,7 +773,7 @@ def init_storage(self, *args, **kwargs):
 
 - Uses `ActionLabelRollout`, which stores both student actions and teacher action labels.
 
-1. ###### Acting
+###### 4.Acting
 
 ```Python
 def act(self, obs, critic_obs):
@@ -807,7 +789,7 @@ def act(self, obs, critic_obs):
 - Stores them as `action_labels`.
 - With probability, replaces student actions with teacher actions.
 
-1. ###### Environment step
+###### 5.Environment step
 
 ```Python
 def process_env_step(self, rewards, dones, infos):
@@ -822,7 +804,7 @@ def process_env_step(self, rewards, dones, infos):
 - Resets teacher hidden states when episodes end.
 - Resamples which environments should use teacher actions.
 
-1. ###### Distillation loss (core)
+###### 6.Distillation loss (core)
 
 ```Python
 def compute_losses(self, minibatch):
@@ -846,7 +828,7 @@ def compute_losses(self, minibatch):
 - Supports multiple formulations: L2, L1, MSE, BCE with tanh.
 - Adds to total loss with `distillation_loss_coef`.
 
-1. ######  Latent distillation
+###### 7. Latent distillation
 
 ```Python
 if self.distill_latent_obs_component_mapping is not None:
@@ -861,11 +843,11 @@ if self.distill_latent_obs_component_mapping is not None:
 - Matches internal representations, not just actions.
 - Useful when student and teacher share encoder structures.
 
-#### 5.2.3.4 estimator.py
+### 4.estimator.py
 
 ##### General Overview
 
-**This file implements an Estimator extension for PPO/TPPO.**
+**This file implements an Estimator extension for** **PPO****/TPPO.**
 
 - Adds a supervised learning head inside the policy model: an **estimator network**.
 - The estimator predicts some target components of the state (from observations).
@@ -885,7 +867,7 @@ from st_rl.storage.rollout_storage import SarsaRolloutStorage
 
 #####  Class Breakdown
 
-1. ###### EstimatorAlgoMixin
+###### 1.EstimatorAlgoMixin
 
 ```Python
 class EstimatorAlgoMixin:
@@ -895,7 +877,7 @@ class EstimatorAlgoMixin:
 - A **mixin** class that adds supervised estimation to PPO/TPPO.
 - Not a standalone algorithm, but combined with PPO or TPPO to form `EstimatorPPO` / `EstimatorTPPO`.
 
-1. ###### Initialization
+###### 2.Initialization
 
 ```Python
 def __init__(self,
@@ -918,7 +900,7 @@ Initializes estimator configs:
 - `estimator_target_obs_components`: target state components to predict.
 - `estimator_loss_kwargs`: extra kwargs for loss function.
 
-1. ###### compute_losses
+###### 3.compute_losses
 
 ```Python
 def compute_losses(self, minibatch):
@@ -969,7 +951,7 @@ return losses, inter_vars, stats
 - Adds mean estimator loss to the total losses dict.
 - Returns extended losses.
 
-1. ###### EstimatorPPO
+###### 4.EstimatorPPO
 
 ```Python
 class EstimatorPPO(EstimatorAlgoMixin, PPO):
@@ -979,7 +961,7 @@ class EstimatorPPO(EstimatorAlgoMixin, PPO):
 - Combines `EstimatorAlgoMixin` + PPO.
 - Runs PPO with estimation loss.
 
-1. ###### EstimatorTPPO
+###### 5.EstimatorTPPO
 
 ```Python
 class EstimatorTPPO(EstimatorAlgoMixin, TPPO):
@@ -989,17 +971,17 @@ class EstimatorTPPO(EstimatorAlgoMixin, TPPO):
 - Combines `EstimatorAlgoMixin` + TPPO.
 - Runs TPPO with estimation loss.
 
-### 5.2.4 modules
+## modules
 
-#### ⚙️ actor_critic.py
+### 1.actor_critic.py
 
-##### 🧩 General Overview 
+##### General Overview 
 
 This module defines the *Actor-Critic architecture* used in reinforcement learning algorithms such as PPO and APPO. It provides unified implementations of the policy network (Actor) and value network (Critic), as well as a combined wrapper class (ActorCritic) that manages their interactions. In the overall algorithm pipeline, this file serves as the **core model definition**, enabling the agent to output actions and estimate values for policy optimization.
 
-##### **📝** Key Classes & Functions
+##### Key Classes & Functions
 
-1. ###### ActorCritic
+###### 1.`ActorCritic`
 
 ```Python
 class ActorCritic(nn.Module):
@@ -1032,7 +1014,7 @@ class ActorCritic(nn.Module):
 - `act()` → samples actions + log-probs (used in rollouts).
 - `evaluate_actions()` → evaluates log-probs, entropy, and values (used in PPO loss).
 
-1. ###### Actor
+###### 2.`Actor`
 
 ```Python
 class Actor(nn.Module):
@@ -1058,7 +1040,7 @@ class Actor(nn.Module):
 - Uses a 2-layer MLP with `tanh` activations.
 - Outputs mean & std for Gaussian distribution (continuous actions).
 
-1. ###### Critic
+###### 3.`Critic`
 
 ```Python
 class Critic(nn.Module):
@@ -1079,16 +1061,16 @@ class Critic(nn.Module):
 - Value network: maps observations → scalar state value V(s)V(s)V(s).
 - Used for advantage estimation and baseline in PPO/APPO.
 
-##### ⚡ Usage Notes
+##### Usage Notes
 
 - `ActorCritic` is the main entry point for PPO/APPO training loops.
 - PPO uses `evaluate_actions()` during optimization (advantage & entropy terms).
 - APPO may extend ActorCritic for distributed or parallel training.
 - Ensure observation & action dimensions match environment spaces.
 
-#### ⚙️actor_critic_field_mutex.py
+### 2.actor_critic_field_mutex.py
 
-##### 🧩 General Overview 
+##### General Overview 
 
 This module extends the **Actor-Critic architecture with sub-policy switching mechanisms**.
 
@@ -1097,9 +1079,9 @@ This module extends the **Actor-Critic architecture with sub-policy switching me
 
 In the PPO/APPO training loop, these classes are used as **policy managers** that select, override, and reset sub-policies during inference.
 
-##### **📝**  Key Classes & Functions
+##### Key Classes & Functions
 
-1. ###### `ActorCriticFieldMutex`
+###### 1.`ActorCriticFieldMutex`
 
 ```Python
 class ActorCriticFieldMutex(ActorCriticMutex):
@@ -1168,9 +1150,9 @@ def reset(self, dones=None):
 ```
 
 - Resamples velocity commands on reset.
-- Calls parent reset.
+- Calls parent reset
 
-1. ###### ActorCriticClimbMutex
+###### 2.`ActorCriticClimbMutex`
 
 ```Python
 class ActorCriticClimbMutex(ActorCriticFieldMutex):
@@ -1201,22 +1183,22 @@ def get_policy_selection(self, observations):
 - Uses `engaging_block` to check if it’s **jump-up or jump-down**.
 - Adds a new one-hot entry for jump-down policy.
 
-##### ⚡ Usage Notes
+##### Usage Notes
 
 - These classes assume environments provide segmented observations (obs_segments).
 - `cmd_vel_mapping` allows per-subpolicy velocity override; can be fixed values or ranges.
 - `action_smoothing_buffer` is crucial when transitions between policies are noisy.
 - `ActorCriticClimbMutex` is specifically for tasks with **jump-up / jump-down differentiation**.
 
-#### ⚙️actor_critic_mutex.py
+### 3.actor_critic_mutex.py
 
-##### 🧩 General Overview 
+##### General Overview 
 
 This module defines the **ActorCriticMutex** class, which extends the base `ActorCritic` to support **multiple sub-policies (submodules)**. It handles **loading pre-trained sub-policy snapshots**, managing per-subpolicy action scales, and orchestrating multiple sub-policies in a single actor-critic wrapper.
 
-##### **📝**  Key Classes & Functions
+#####  Key Classes & Functions
 
-1. ###### ActorCriticMutex.__init__
+###### 1.`ActorCriticMutex.__init__`
 
 ```Python
 def __init__(self,
@@ -1258,7 +1240,7 @@ for subpolicy_idx, sub_path in enumerate(sub_policy_paths):
 - Iterates through sub-policy paths and loads each policy instance.
 - Updates `is_recurrent` if any sub-policy uses a recurrent architecture.
 
-1. ###### `reset()`
+###### 2.`reset()`
 
 ```Python
 def reset(self, dones=None):
@@ -1269,7 +1251,7 @@ def reset(self, dones=None):
 - Resets all sub-policy modules.
 - Propagates `dones` to each sub-policy.
 
-1. ######  `act()` 与 `act_inference()`
+###### 3.`act()` 与 `act_inference()`
 
 ```Python
 def act(self, observations, **kwargs):
@@ -1282,7 +1264,7 @@ def act_inference(self, observations):
 - Placeholder methods for action selection.
 - These need to be implemented in derived classes (like `ActorCriticFieldMutex`) for actual inference.
 
-1. ###### `subpolicy_action_scale registration`
+###### 4.`subpolicy_action_scale registration`
 
 ```Python
 self.register_buffer(
@@ -1296,22 +1278,22 @@ self.register_buffer(
 - Registers the action scale for each sub-policy as a persistent buffer.
 - Used to normalize outputs from each sub-policy.
 
-##### ⚡ Usage Notes
+##### Usage Notes
 
 - `ActorCriticMutex` itself does **not implement action inference**.
 - Must be used as a base class for more specialized mutex policies (e.g., `ActorCriticFieldMutex`).
 - Handles **loading and managing multiple pre-trained sub-policies**.
 - Supports recurrent sub-policies, action scaling, and batched resets.
 
-#### ⚙️actor_critic_recurrent.py
+### 4.actor_critic_recurrent.py
 
-##### 🧩 General Overview 
+##### General Overview 
 
 This module extends the **Actor-Critic framework** with **recurrent memory** using GRU or LSTM. It enables policies to **maintain hidden states across time**, allowing learning from sequential and partially observable environments.
 
-##### **📝**  Key Classes & Functions
+##### Key Classes & Functions
 
-1. ###### ActorCriticRecurrent
+###### 1.`ActorCriticRecurrent`
 
 ```Python
 class ActorCriticRecurrent(ActorCritic):
@@ -1381,7 +1363,7 @@ def get_hidden_states(self):
 - Return the current hidden states of both actor and critic.
 - Useful for saving/restoring recurrent policy states.
 
-1. ###### Memory
+###### 2.`Memory`
 
 ```Python
 class Memory(torch.nn.Module):
@@ -1401,7 +1383,7 @@ self.hidden_states = None
 - Initializes the RNN with configurable hidden size and layers.
 - Stores hidden states for sequential updates.
 
-1. ######  `ActorCriticHiddenState` & `LstmHiddenState`
+###### 3.`ActorCriticHiddenState` & `LstmHiddenState`
 
 ```Python
 ActorCriticHiddenState = namedarraytuple('ActorCriticHiddenState', ['actor', 'critic'])
@@ -1411,16 +1393,16 @@ LstmHiddenState = namedarraytuple('LstmHiddenState', ['hidden', 'cell'])
 - `ActorCriticHiddenState`: holds actor & critic hidden states.
 - `LstmHiddenState`: holds LSTM’s `(hidden, cell)` states.
 
-##### ⚡ Usage Notes
+##### Usage Notes
 
 - `ActorCriticRecurrent` is suitable for **partially observable environments**.
 - Requires careful handling of hidden states during rollout/episode transitions.
 - `reset(dones)` must be called whenever environments terminate.
 - Action & value networks are conditioned on **RNN-encoded inputs**, not raw observations.
 
-#### ⚙️all_mixer.py
+### 5.all_mixer.py
 
-##### 🧩 General Overview 
+#####  General Overview 
 
 This module defines **composite Actor-Critic classes** by combining mixins:
 
@@ -1430,9 +1412,9 @@ This module defines **composite Actor-Critic classes** by combining mixins:
 
 It provides modular, reusable policy classes with extended functionality (encoding + estimation + recurrent memory).
 
-##### **📝**  Key Classes & Functions
+##### Key Classes & Functions
 
-1. ###### EncoderStateAc
+###### 1.`EncoderStateAc`
 
 ```Python
 class EncoderStateAc(EstimatorMixin, EncoderActorCriticMixin, ActorCritic):
@@ -1442,7 +1424,7 @@ class EncoderStateAc(EstimatorMixin, EncoderActorCriticMixin, ActorCritic):
 - Combines **state estimation**, **encoder**, and **standard Actor-Critic**.
 - Used when the policy requires both latent encoding (e.g., from raw inputs) and state estimation.
 
-1. ###### EncoderStateAcRecurrent
+###### 2.`EncoderStateAcRecurrent`
 
 ```Python
 class EncoderStateAcRecurrent(EstimatorMixin, EncoderActorCriticMixin, ActorCriticRecurrent):
@@ -1455,7 +1437,7 @@ class EncoderStateAcRecurrent(EstimatorMixin, EncoderActorCriticMixin, ActorCrit
 - Suitable for **partially observable tasks** with encoder + estimator + RNN memory.
 - Defines placeholder method `load_misaligned_state_dict` for handling **parameter misalignment** when loading pretrained models.
 
-##### ⚡ Usage Notes
+#####  Usage Notes
 
 - These composite classes **do not add new methods** (except the placeholder in `EncoderStateAcRecurrent`).
 - Their role is to **combine behaviors from multiple mixins** into a single policy class.
@@ -1463,9 +1445,9 @@ class EncoderStateAcRecurrent(EstimatorMixin, EncoderActorCriticMixin, ActorCrit
 - `EncoderStateAcRecurrent` → recurrent version, must manage hidden states across rollouts.
 - The `load_misaligned_state_dict` method needs proper implementation before model loading works safely.
 
-#### ⚙️amp_discriminator.py
+### 6.amp_discriminator.py
 
-##### 🧩 General Overview 
+#####  General Overview 
 
 This module integrates **Adversarial Motion Priors (AMP)** into the Actor-Critic framework.
 
@@ -1475,9 +1457,9 @@ This module integrates **Adversarial Motion Priors (AMP)** into the Actor-Critic
   - `AmpActorCritic` (standard)
   - `AmpActorCriticRecurrent` (with RNN memory).
 
-##### **📝**  Key Classes & Functions
+#####  Key Classes & Functions
 
-1. ###### AMPDiscriminator
+###### 1.`AMPDiscriminator`
 
 ```Python
 class AMPDiscriminator(nn.Module):
@@ -1494,7 +1476,7 @@ class AMPDiscriminator(nn.Module):
 - `compute_grad_pen(amp_obs)` → gradient penalty regularization.
 - `predict_style_reward(state, task_reward)` → computes style reward from discriminator + mixes with task reward.
 
-1. ######  `AmpMixin`
+###### 2.`AmpMixin`
 
 ```Python
 class AmpMixin:
@@ -1507,7 +1489,7 @@ class AmpMixin:
 - A mixin that **injects AMPDiscriminator into Actor-Critic**.
 - Initializes the discriminator from config (`amp_discriminator` kwargs).
 
-1. ######  `AmpActorCritic` / `AmpActorCriticRecurrent`
+###### 3. `AmpActorCritic` / `AmpActorCriticRecurrent`
 
 ```Python
 class AmpActorCritic(AmpMixin, ActorCritic):
@@ -1520,23 +1502,23 @@ class AmpActorCriticRecurrent(AmpMixin, ActorCriticRecurrent):
 - **`AmpActorCritic`** → standard actor-critic with discriminator.
 - **`AmpActorCriticRecurrent`** → recurrent version with memory (suitable for partially observable tasks).
 
-##### ⚡ Usage Notes
+##### Usage Notes
 
 - AMP introduces a **style reward** from the discriminator that complements task rewards.
 - `task_reward_lerp` controls interpolation between style and task rewards.
 - `discriminator_grad_pen` helps stabilize training via gradient penalty.
-- AMP policies must handle both **policy optimization** (PPO/APPO) and **adversarial training** of the discriminator.
+- AMP policies must handle both **policy** **optimization** (PPO/APPO) and **adversarial training** of the discriminator.
 - `AmpActorCriticRecurrent` requires managing hidden states properly across rollouts.
 
-#### ⚙️conv2d.py
+### 7.conv2d.py
 
-##### 🧩 General Overview 
+#####  General Overview 
 
 This file defines convolutional model components used in `st_rl` to process visual observations (images). It provides a generic **Conv2dModel** for stacked convolutional layers and a higher-level **Conv2dHeadModel** that combines convolutional feature extraction with a fully connected MLP head. These modules are typically used in actor-critic architectures when the policy or value network needs to handle image inputs.
 
-##### **📝**  Key Classes & Functions
+##### Key Classes & Functions
 
-1. ###### Conv2dModel
+###### 1.`Conv2dModel`
 
 ```Python
 class Conv2dModel(torch.nn.Module):
@@ -1547,13 +1529,13 @@ class Conv2dModel(torch.nn.Module):
 ```
 
 - A stack of 2D convolutional layers (`torch.nn.Conv2d`).
-- Supports **optional normalization layers** and **nonlinear activations**.
+- Supports **optional** **normalization** **layers** and **nonlinear activations**.
 - Can use either **strides** or **max-pooling** for downsampling.
 - Provides utility functions:
   - `conv_out_size(h, w)`: Computes the flattened output size for a given input resolution.
   - `conv_out_resolution(h, w)`: Computes the height and width after convolutions.
 
-1. ######  `Conv2dHeadModel`
+###### 2.`Conv2dHeadModel`
 
 ```Python
 class Conv2dHeadModel(torch.nn.Module):
@@ -1563,28 +1545,28 @@ class Conv2dHeadModel(torch.nn.Module):
     """
 ```
 
-- A higher-level model that **first applies convolution** (`Conv2dModel`) and then **adds a fully-connected head** (`MlpModel`).
+- A higher-level model that **first applies** **convolution** (`Conv2dModel`) and then **adds a fully-connected head** (`MlpModel`).
 - Requires the **full image shape (C, H, W)** to build the MLP head.
 - Output size can be specified explicitly via `output_size`, otherwise it defaults to the last hidden size.
 
-##### ⚡ Usage Notes
+##### Usage Notes
 
 - `Conv2dModel` is useful for building **feature extractors** for images in reinforcement learning environments.
-- `Conv2dHeadModel` is especially handy when you want both **convolutional features** and a **flattened MLP head** (e.g., for actor-critic input).
+- `Conv2dHeadModel` is especially handy when you want both **convolutional features** and a **flattened** **MLP** **head** (e.g., for actor-critic input).
 - If `use_maxpool=True`, convolutions will have stride=1 and downsampling will happen via `MaxPool2d`.
 - `conv_out_size` is very useful when you need to compute the number of features before flattening into MLP.
 
-#### ⚙️deterministic_policy.py
+### 8.deterministic_policy.py
 
-##### 🧩 General Overview 
+##### General Overview 
 
 This file defines a simple **mixin class** `DeterministicPolicyMixin` that modifies the behavior of the `act()` method in policy networks. Instead of sampling actions (like in stochastic policies), it enforces **deterministic actions** by always returning the mean action (`self.action_mean`).
 
 This is useful in contexts such as **evaluation/inference**, where deterministic behavior is preferred over exploration.
 
-##### **📝**  Key Classes & Functions
+##### Key Classes & Functions
 
-1. ###### DeterministicPolicyMixin
+###### 1.`DeterministicPolicyMixin`
 
 ```Python
 class DeterministicPolicyMixin:
@@ -1597,23 +1579,23 @@ class DeterministicPolicyMixin:
 - Calls the **parent’s** **`act()`** **method** (`super().act(...)`) to preserve preprocessing logic.
 - Instead of returning the sampled action, it returns `self.action_mean`, i.e., the **mean of the action distribution**.
 
-##### ⚡ Usage Notes
+##### Usage Notes
 
 - This mixin is not standalone; it must be combined with a base policy class (e.g., `ActorCritic`) that defines `self.action_mean`.
 - Often used for **evaluation** (deterministic rollout) while training may still rely on stochastic policies.
 - If `self.action_mean` is not defined in the parent class, this mixin will fail.
 
-#### ⚙️encoder_actor_critic.py
+### 9.encoder_actor_critic.py
 
-##### 🧩 General Overview 
+##### General Overview 
 
 This file introduces the **EncoderActorCriticMixin**, which extends Actor-Critic architectures by embedding observations (or privileged observations) through dedicated **encoders** (MLPs or CNNs). It allows modular handling of complex observations (like proprioceptive + vision input), replacing raw segments of the observation vector with **latent features** before feeding them into the actor/critic networks.
 
 It also provides concrete combined classes (`EncoderActorCritic`, `EncoderActorCriticRecurrent`, `EncoderAmpActorCriticRecurrent`) by mixing the encoder logic with base Actor-Critic variants.
 
-##### **📝**  Key Classes & Functions
+#####  Key Classes & Functions
 
-1. ###### EncoderActorCriticMixin
+###### 1.EncoderActorCriticMixin
 
 ```Python
 class EncoderActorCriticMixin:
@@ -1668,7 +1650,7 @@ def evaluate(self, critic_observations, ...): ...
   - `act_inference`: deterministic inference with encoders.
   - `evaluate`: encodes critic obs if needed, then calls parent evaluation.
 
-1. ###### Combined Classes
+###### 2.Combined Classes
 
 ```Python
 class EncoderActorCritic(EncoderActorCriticMixin, ActorCritic): pass
@@ -1682,27 +1664,27 @@ These combine the **EncoderActorCriticMixin** with different Actor-Critic varian
 - `EncoderActorCriticRecurrent`: with recurrent policy.
 - `EncoderAmpActorCriticRecurrent`: for AMP (Adversarial Motion Prior) training.
 
-##### ⚡ Usage Notes
+#####  Usage Notes
 
 - Encoders are modular: add more by listing names in `encoder_component_names`.
 - `critic_encoder_component_names="shared"` → critic reuses actor encoders.
 - Must carefully configure `obs_segments` so slices match actual obs layout.
 - Useful when obs is multi-modal (e.g., proprioception + images).
 
-#### ⚙️mlp.py
+### 10.mlp.py
 
-##### 🧩 General Overview 
+##### General Overview 
 
-This module defines a **Multilayer Perceptron (MLP)** model as a reusable PyTorch component.
+This module defines a **Multilayer Perceptron** **(****MLP****)** model as a reusable PyTorch component.
 
-- Supports **flexible hidden layer configuration** (including none, making it linear).
+- Supports **flexible** **hidden layer** **configuration** (including none, making it linear).
 - Allows **custom nonlinearities** (by class, not functional).
 - Last layer can be **linear or nonlinear**, depending on whether `output_size` is provided.
 - Provides a clean interface for retrieving the effective output dimensionality.
 
-##### **📝**  Key Classes & Functions
+##### Key Classes & Functions
 
-1. ###### `MlpModel`
+###### `MlpModel`
 
 ```Python
 class MlpModel(torch.nn.Module):
@@ -1736,27 +1718,27 @@ class MlpModel(torch.nn.Module):
   - Input shape: `[B, input_size]`.
 - `output_size (property)` → Returns effective model output dimensionality.
 
-##### ⚡ Usage Notes
+#####  Usage Notes
 
 - Flexible: can represent **linear, shallow, or deep MLPs** depending on `hidden_sizes`.
 - When `output_size=None`, the model ends in a **nonlinear hidden state**, often used as a feature encoder.
 - When `output_size` is set, the model outputs a **linear projection**, suitable for regression or policy/value outputs.
 - Useful as a **building block** in RL architectures (e.g., policy networks, critics, encoders).
 
-#### ⚙️normalizer.py
+### 11.normalizer.py
 
-##### 🧩 General Overview 
+##### General Overview 
 
 This module provides different strategies for **normalizing data** in reinforcement learning and machine learning pipelines.
 
-- Implements **empirical normalization** (online updates during training).
-- Provides a simple **unit vector normalization** wrapper.
-- Includes **running mean and variance statistics** for streaming data.
+- Implements **empirical** **normalization** (online updates during training).
+- Provides a simple **unit vector** **normalization** wrapper.
+- Includes **running mean and** **variance** **statistics** for streaming data.
 - Extends these with a **normalizer utility** that clips observations and supports both NumPy and PyTorch. These tools are essential for stabilizing learning, avoiding exploding values, and ensuring consistent input scaling.
 
-##### **📝**  Key Classes & Functions
+##### Key Classes & Functions
 
-1. ###### `EmpiricalNormalization`
+###### 1.`EmpiricalNormalization`
 
 ```Python
 class EmpiricalNormalization(nn.Module):
@@ -1768,19 +1750,1322 @@ class EmpiricalNormalization(nn.Module):
   - shape (int or tuple) → Expected input shape (excluding batch).
   - eps (float) → Small constant to avoid division by zero.
   - until (int or None) → If set, stops updating after processing this many samples.
+- Key Methods & Properties:
+  - forward(x) → Returns normalized values (x - mean) / (std + eps).
+  - update(x) → Updates running mean/variance (only during training).
+  - inverse(y) → Reverts normalization.
+  - mean, std (properties) → Return current statistics.
 
-​    Key Methods & Properties:
+###### 2.`Normalize`
 
-​        forward(x) → Returns normalized values (x - mean) / (std + eps).
+```Python
+class Normalize(torch.nn.Module):
+    """Wrapper around torch.nn.functional.normalize (L2 norm)."""
+```
 
-​        update(x) → Updates running mean/variance (only during training).
+- Purpose: Applies L2 normalization along the last dimension.
+- Methods:
+  - forward(x) → Normalizes vectors to unit length (dim=-1).
+- Use Case: Feature embedding normalization (e.g., in contrastive learning).
 
-​        inverse(y) → Reverts normalization.
+###### 3.`RunningMeanStd`
 
-​        mean, std (properties) → Return current statistics.
+```Python
+class RunningMeanStd(object):
+    """Tracks running mean and variance of a data stream."""
+```
 
-##### ⚡ Usage Notes
+**Purpose:** Online algorithm for mean/variance (parallel variance algorithm).
 
-### 📂runners
+**Constructor Arguments:**
 
-### 📂storage
+- `epsilon (float)` → Small constant to initialize counts.
+- `shape (tuple)` → Shape of tracked statistics.
+
+**Key Methods:**
+
+- `update(arr)` → Updates stats from a batch of samples.
+- `update_from_moments(batch_mean, batch_var, batch_count)` → Incremental moment updates.
+
+**Use Case:** Tracking normalization stats for streaming data in RL.
+
+###### 4.`Normalizer`
+
+```Python
+class Normalizer(RunningMeanStd):
+    """Extends RunningMeanStd with clipping and PyTorch support."""
+```
+
+**Purpose:** Normalizes and optionally clips observations for stability.
+
+**Constructor Arguments:**
+
+- `input_dim (tuple)` → Shape of input.
+- `epsilon (float)` → Stability constant.
+- `clip_obs (float)` → Max absolute value after normalization.
+
+**Key Methods:**
+
+- `normalize(input)` → Normalizes NumPy array, clips to `[-clip_obs, clip_obs]`.
+- `normalize_torch(input, device)` → Updates stats, normalizes PyTorch tensor, clips.
+- `update_normalizer(rollouts, expert_loader)` → Updates stats from both policy and expert batches (AMP training).
+
+**Use Case:** Widely used in RL pipelines to preprocess states/observations.
+
+##### Usage Notes
+
+- `EmpiricalNormalization` → Best when normalization should update **in-model during training**.
+- `Normalize` → Lightweight L2 normalization, mainly for **embedding scaling**.
+- `RunningMeanStd` → Provides a **base algorithm** for streaming stats.
+- `Normalizer` → Practical RL tool: combines streaming stats, clipping, and PyTorch integration.
+- `update_normalizer` is especially relevant in **adversarial imitation learning (AMP/GAIL)**, where both **expert** and **policy** data streams are combined for consistent normalization.
+
+### 12.state_adaptor.py
+
+##### General Overview 
+
+This module introduces an **actor-critic extension with privileged state estimation**.
+
+- Adds a **state adaptor network** that predicts certain hidden/privileged states from available observations.
+- Supports both **feedforward** and **recurrent** (memory-based) adaptors.
+- Allows probabilistic replacement of raw observations with estimated states, improving robustness and enabling partial observability handling.
+- Defines recurrent and non-recurrent composite Actor-Critic classes via mixins.
+
+##### Key Classes & Functions
+
+###### 1.`AdaptorActorHiddenState`
+
+```Python
+AdaptorActorHiddenState = namedarraytuple('AdaptorActorHiddenState', ['adaptor', 'actor'])
+```
+
+- **Purpose:** Defines a structured container for hidden states when both **adaptor** and **actor** have their own recurrent states.
+- Used in recurrent setups to keep track of adaptor’s memory separately from actor’s RNN state.
+
+###### 2.`PrivilegeEstimatorMixin`
+
+```Python
+class PrivilegeEstimatorMixin:
+    """Adds a state adaptor module for estimating privileged state features."""
+```
+
+- **Purpose:** Core mixin that augments an Actor-Critic with a **learned state estimator (adaptor)**.
+- **Constructor Arguments:**
+  - `adaptor_obs_components` → Components of observation used as adaptor input.
+  - `adaptor_target_components` → Components of observation to be estimated by adaptor.
+  - `adaptor_kwargs (dict)` → Extra config for the MLP adaptor.
+  - `privilege_replace_state_prob (float)` → Probability of replacing raw observation with estimated state.
+- **Key Methods:**
+  - `build_adaptor()`
+    - If recurrent → uses `Memory` + `MlpModel` head.
+    - If feedforward → uses `MlpModel` directly.
+  - `reset(dones=None)` → Resets memory (if recurrent).
+  - `act(observations, masks=None, hidden_states=None, inference=False)`
+    - Runs adaptor to estimate target states.
+    - With probability `privilege_replace_state_prob`, substitutes estimated state into actor input.
+    - Delegates action selection to parent class (feedforward or recurrent).
+  - `act_inference(observations)` → Inference-only variant (no hidden states).
+  - `get_estimated_state()` → Returns last computed estimated state.
+  - `get_hidden_states()` → Combines adaptor + actor hidden states into a structured tuple.
+
+**Notable Implementation Detail:**
+
+- `substitute_estimated_state` is used to splice estimated components into the observation tensor.
+- In recurrent mode, the `Memory` module is responsible for handling sequence padding/unpadding.
+
+###### 3.`PrivilegeStateAcRecurrent`
+
+```Python
+class PrivilegeStateAcRecurrent(PrivilegeEstimatorMixin, EstimatorMixin, ActorCriticRecurrent):
+    pass
+```
+
+**Purpose:** Defines a **recurrent actor-critic policy** that integrates:
+
+- State estimator mixin (`PrivilegeEstimatorMixin`).
+- General state estimator (`EstimatorMixin`).
+- Recurrent actor-critic (`ActorCriticRecurrent`).
+
+**Use Case:** Policies for **partially observable RL tasks** that benefit from:
+
+- Estimating hidden states,
+- Recurrent memory,
+- Privileged replacement of inputs.
+
+##### Usage Notes
+
+**Feedforward vs Recurrent:**
+
+- If `is_recurrent=False` → adaptor is just an MLP.
+- If `is_recurrent=True` → adaptor includes an RNN (`Memory`) + MLP head.
+
+**State Replacement:**
+
+- Controlled by `privilege_replace_state_prob`.
+- Encourages robustness by blending estimated states with raw inputs.
+
+**Hidden State Management:**
+
+- Must track adaptor + actor RNN states separately (via `AdaptorActorHiddenState`).
+
+**Integration:**
+
+- Plug-in mixin style means this can be easily combined with existing Actor-Critic classes.
+
+### 13.state_estimator.py
+
+##### General Overview 
+
+This module introduces an **actor-critic extension with an internal state estimator**.
+
+- Adds a **state estimator network** that predicts certain target states (latent or privileged) from a subset of observation components.
+- Supports both **feedforward** and **recurrent** estimator variants.
+- Can probabilistically **replace raw observation components** with estimated values, improving robustness under partial observability.
+- Provides both standard and recurrent Actor-Critic classes with built-in state estimation.
+
+##### Key Classes & Functions
+
+###### 1.`EstimatorActorHiddenState`
+
+```Python
+EstimatorActorHiddenState = namedarraytuple('EstimatorActorHiddenState', ['estimator', 'actor'])
+```
+
+- **Purpose:** Container for **estimator** and **actor** hidden states.
+- Used in recurrent policies to keep RNN memory of both estimator and actor.
+
+###### 2.`EstimatorMixin`
+
+```Python
+class EstimatorMixin:
+    """Adds a learned state estimator to Actor-Critic."""
+```
+
+- **Purpose:** Core mixin that equips an Actor-Critic policy with a **state estimator model**.
+- **Constructor** **Args****:**
+  - `estimator_obs_components` → observation components used as estimator input.
+  - `estimator_target_components` → observation components to be predicted.
+  - `estimator_kwargs (dict)` → configuration for the estimator MLP.
+  - `use_actor_rnn (bool)` → if true, use actor RNN outputs as estimator input.
+  - `replace_state_prob (float)` → probability of replacing raw state with estimated state.
+- **Key Methods:**
+  - `build_estimator()`
+    - Feedforward: `MlpModel(input_size, output_size)`.
+    - Recurrent + `use_actor_rnn=True`: estimator directly consumes actor RNN hidden state.
+    - Recurrent + `use_actor_rnn=False`: separate estimator memory (`Memory`) + MLP head.
+  - `reset(dones=None)` → resets estimator memory if needed.
+  - `act(observations, masks=None, hidden_states=None, inference=False)`
+    - Runs estimator to compute target state.
+    - With probability `replace_state_prob`, substitutes estimated values into observations.
+    - Delegates action selection to the actor (feedforward or recurrent).
+  - `act_inference(observations)` → inference-only shortcut.
+  - `get_estimated_state()` → returns the most recent estimated state.
+  - `get_hidden_states()` → merges estimator + actor hidden states into a structured tuple.
+
+**Notable Detail:**
+
+- The assertion ensures you cannot set both `replace_state_prob > 0` and `use_actor_rnn=True`, since replacement after actor’s RNN already processed the input would be inconsistent.
+
+###### 3.`StateAc`
+
+```Python
+class StateAc(EstimatorMixin, ActorCritic):
+    pass
+```
+
+**Purpose:** **Non-recurrent actor-critic** with state estimation.
+
+Suitable when observations are fully available per timestep (no need for recurrent memory).
+
+4.`StateAcRecurrent`
+
+```Plain
+class StateAcRecurrent(EstimatorMixin, ActorCriticRecurrent):
+    pass
+```
+
+- **Purpose:** **Recurrent actor-critic** with state estimation.
+- Combines estimator + actor RNN memory to handle partially observable tasks.
+
+##### Usage Notes
+
+**Choice of** **Input****:**
+
+- If `use_actor_rnn=True` → estimator consumes actor’s recurrent hidden state.
+- Else → estimator has its own memory (`memory_s`).
+
+**State Replacement:**
+
+- Controlled by `replace_state_prob`.
+- Encourages robustness and consistency in observation usage.
+
+**Integration:**
+
+- `StateAc` → feedforward version.
+- `StateAcRecurrent` → recurrent version.
+
+**Workflow****:**
+
+- Call `.act()` → estimator predicts hidden states → optional replacement → actor selects action.
+- Call `.get_estimated_state()` to access estimator outputs after each action step.
+
+### 14.utils.py
+
+##### General Overview 
+
+This module provides utility functions to support model construction:
+
+- `get_activation_Cls` → Maps string names to PyTorch activation classes.
+- `conv2d_output_shape` → Computes output height & width of a Conv2D / Pooling operation given kernel, stride, padding, and dilation.
+
+##### Key Classes & Functions
+
+###### 1.`get_activation_Cls(activation_name)`
+
+- Maps a string (e.g., `"relu"`, `"tanh"`) to the corresponding `torch.nn` activation class.
+- Supports both built-in PyTorch names and custom aliases (`"lrelu" → LeakyReLU`, `"crelu" → ReLU`).
+- Returns the **class**, not an instance.
+- If the activation name is invalid, prints a warning and returns `None`.
+
+###### 2.`activation_utils.py`
+
+- Computes the output `(height, width)` after applying a Conv2D or pooling layer.
+- Uses the standard convolution formula accounting for kernel size, stride, padding, and dilation.
+- Accepts both integers and `(h, w)` tuples for parameters.
+
+##### Usage Notes
+
+- `get_activation_Cls` is useful when models are defined from config files with activation specified as strings.
+
+```Plain
+act_cls = get_activation_Cls("relu")
+activation = act_cls()   # instantiate
+```
+
+- `conv2d_output_shape` helps design CNNs without hardcoding dimensions.
+
+```Plain
+h, w = conv2d_output_shape(64, 64, kernel_size=3, stride=2, padding=1)
+print(h, w)  # → (32, 32)
+```
+
+- These utilities simplify building flexible and modular neural network architectures.
+
+### 15.visual_actor_critic.py
+
+##### General Overview 
+
+This module extends the Actor-Critic framework to handle **visual observations**.
+
+- Encodes image-like inputs (e.g., depth maps, RGB frames) into a compact latent vector via a convolutional encoder.
+- Replaces the raw visual input in the observation with its latent representation before passing it to the actor or critic.
+- Supports both **feedforward** and **recurrent** variants, with optional deterministic policy behavior.
+- Designed for tasks where agents rely on pixel-level or spatial observations alongside state vectors.
+
+##### Key Classes & Functions
+
+###### 1.`VisualActorCriticMixin`
+
+- A mixin that augments Actor-Critic with a **visual encoder**.
+- **Key Parameters:**
+  - `visual_component_name`: name of the observation component treated as visual input.
+  - `visual_kwargs`: CNN config (channels, kernel_sizes, strides, hidden_sizes).
+  - `visual_latent_size`: size of the latent embedding vector.
+- **Core Methods:**
+  - `embed_visual_latent(observations)`: encodes visual slice → latent vector, reinserts into observation.
+  - `act(observations, **kwargs)`: runs actor with latent-embedded obs.
+  - `act_inference(observations)`: inference-only version.
+  - `act_with_embedded_latent(observations, **kwargs)`: assumes latent already embedded, skips re-encoding.
+
+###### 2.`VisualDeterministicRecurrent`
+
+- Combines **DeterministicPolicyMixin + VisualActorCriticMixin + ActorCriticRecurrent**.
+- A recurrent actor-critic with deterministic actions and visual encoder.
+
+###### 3.`VisualDeterministicAC`
+
+- Combines **DeterministicPolicyMixin + VisualActorCriticMixin + ActorCritic**.
+- A feedforward actor-critic with deterministic actions and visual encoder.
+
+##### Usage Notes
+
+- To use with visual input, ensure `obs_segments` includes a component (e.g., `"forward_depth"`) matching `visual_component_name`.
+- Example:
+
+```Plain
+model = VisualDeterministicAC(
+    num_actor_obs=512,
+    num_critic_obs=512,
+    num_actions=12,
+    obs_segments=obs_segments,
+    visual_component_name="forward_depth",
+    visual_kwargs=dict(channels=[32, 64], kernel_sizes=[5, 3], strides=[2, 2]),
+    visual_latent_size=128,
+)
+
+actions = model.act(observations)
+```
+
+- `act_with_embedded_latent` can be used for efficiency if multiple modules share the same visual encoder.
+- Useful in **vision-based locomotion, navigation, and manipulation tasks**.
+
+## runners
+
+### 1.amp_policy_runner.py
+
+#### Class: `AmpPolicyRunner`
+
+##### Definition
+
+```Python
+class AmpPolicyRunner(OnPolicyRunner):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+```
+
+- **Inheritance**: `AmpPolicyRunner` extends `OnPolicyRunner`.
+- **Purpose**: It implements a full **training loop runner** for reinforcement learning.
+- **Specialty**: The prefix **AMP** (Adversarial Motion Priors) indicates that this runner is designed for imitation + RL hybrid training.
+
+####  Core Method: `learn`
+
+```Python
+def learn(self, num_learning_iterations, init_at_random_ep_len=False, trial=None):
+```
+
+##### Parameters
+
+- `num_learning_iterations`: number of training iterations.
+- `init_at_random_ep_len`: whether to initialize episodes at random lengths (data augmentation).
+- `trial`: optional handle for hyperparameter tuning frameworks (Optuna, Ray Tune, etc.), used for reporting metrics.
+
+####  Execution Flow
+
+1.Writer & Observation Initialization
+
+```Python
+self.init_writter(init_at_random_ep_len)
+obs, extras = self.env.get_observations()
+critic_obs = extras["observations"].get("critic", obs)
+```
+
+- Initializes log writer (TensorBoard, wandb, etc.).
+- Gets initial observations:
+  - `obs`: actor observations.
+  - `critic_obs`: critic privileged observations (may include more state info).
+
+2.Switch to Training Mode
+
+```Python
+self.train_mode()
+```
+
+- Ensures models run in training mode (dropout, batch norm, etc.).
+
+3.Buffers Setup
+
+```Python
+ep_infos = []
+rframebuffer = deque(maxlen=2000)
+rewbuffer = deque(maxlen=100)
+lenbuffer = deque(maxlen=100)
+cur_reward_sum = torch.zeros(self.env.num_envs, ...)
+cur_episode_length = torch.zeros(self.env.num_envs, ...)
+```
+
+- `ep_infos`: stores episode statistics.
+- `rframebuffer`: reward frame buffer.
+- `rewbuffer`: episode rewards.
+- `lenbuffer`: episode lengths.
+- `cur_reward_sum`: cumulative reward per environment.
+- `cur_episode_length`: cumulative episode length.
+
+4.Main Training Loop
+
+```Python
+for it in range(start_iter, tot_iter):
+```
+
+(1) Rollout Phase
+
+```Python
+with torch.inference_mode(self.cfg.get("inference_mode_rollout", True)):
+    for i in range(self.num_steps_per_env):
+        obs, critic_obs, rewards, dones, infos = self.rollout_step(obs, critic_obs)
+```
+
+- Executes steps in the environment.
+- Collects `(obs, critic_obs, rewards, dones, infos)`.
+- Updates cumulative rewards, lengths, and episode statistics.
+
+(2) Learning Phase
+
+```Python
+self.alg.compute_returns(critic_obs)
+losses, stats = self.alg.update(self.current_learning_iteration)
+```
+
+- `compute_returns`: calculates returns/GAE.
+- `update`: updates policy and critic networks, returns losses and stats.
+
+(3) Evaluation
+
+```Python
+self.evaluation()
+if trial is not None:
+    trial.report(self.metrics_velrmsd, self.current_learning_iteration)
+```
+
+- Runs evaluation episodes.
+- Reports metrics (`metrics_velrmsd`, `metrics_CoT`) to hyperparameter search trial if provided.
+
+(4) Logging & Saving
+
+```Python
+if self.log_dir is not None and self.current_learning_iteration % self.log_interval == 0:
+    self.log(locals())
+if self.current_learning_iteration % self.save_interval == 0:
+    self.save(...)
+```
+
+- Periodically logs training data.
+- Periodically saves checkpoints.
+
+(5) Code State Archiving
+
+```Python
+if it == start_iter:
+    git_file_paths = store_code_state(self.log_dir, self.git_status_repos)
+```
+
+- Saves current git diff for reproducibility.
+- Can upload code snapshot to wandb/neptune.
+
+5.Final Save
+
+```Python
+self.save(os.path.join(self.log_dir, 'model_{}.pt'.format(self.current_learning_iteration)))
+```
+
+- Saves the final model after training ends.
+
+#### Example Usage
+
+```Python
+from st_rl.runners.amp_policy_runner import AmpPolicyRunner
+from st_rl.env import VecEnv
+import st_rl.algorithms as algorithms
+
+# 1. Create environment
+env = VecEnv(cfg)
+
+# 2. Create algorithm
+algo = algorithms.APPO(cfg, env)
+
+# 3. Create runner
+runner = AmpPolicyRunner(env, algo, device="cuda:0", log_dir="./logs")
+
+# 4. Train
+runner.learn(num_learning_iterations=10000)
+
+# 5. Get metrics
+print("Final metrics:", runner.metrics_velrmsd, runner.metrics_CoT)
+```
+
+### 2.dagger_saver.py
+
+#### Class: `DaggerSaver`
+
+##### Definition
+
+```Python
+class DaggerSaver(DemonstrationSaver):
+    """This demonstration saver will rollout the trajectory by running the student policy
+    (with a probability) and label the trajectory by running the teacher policy."""
+```
+
+- **Inheritance**: Extends `DemonstrationSaver`.
+- **Purpose**: Implements the **DAgger (Dataset Aggregation)** algorithm:
+  - Rollouts may use the **student policy** (current trained policy).
+  - Labels are always generated by the **teacher policy** (expert / ground truth).
+- **Key Idea**: Correct student actions with expert labels to improve imitation.
+
+#### Constructor (`init`)
+
+```Python
+def __init__(..., 
+             training_policy_logdir, 
+             teacher_act_prob="exp", 
+             update_times_scale=5000, 
+             action_sample_std=0.0, 
+             log_to_tensorboard=False, 
+             **kwargs):
+```
+
+##### Parameters
+
+- `training_policy_logdir`: directory where the student policy is saved/loaded.
+- `teacher_act_prob`: probability of using the teacher’s action instead of student’s (can be function or string like `"exp"`).
+- `update_times_scale`: scale factor for probability schedule.
+- `action_sample_std`: adds Gaussian noise to student actions (exploration).
+- `log_to_tensorboard`: whether to log rollout statistics.
+
+##### Special Initialization
+
+- If `log_to_tensorboard=True`, creates a TensorBoard writer.
+- Wraps `teacher_act_prob` into a function using `GET_PROB_FUNC` if it’s a string.
+
+#### Core Methods
+
+##### 1.`init_traj_handlers`
+
+```Python
+def init_traj_handlers(self):
+    self.metadata["training_policy_logdir"] = ...
+    self.build_training_policy()
+```
+
+- Extends base trajectory handler.
+- Stores metadata and builds initial **training (student) policy**.
+
+##### 2. `init_storage_buffer`
+
+```Python
+def init_storage_buffer(self):
+    self.rollout_episode_infos = []
+```
+
+- Extends base buffer.
+- Adds storage for rollout episode info.
+
+##### 3. `build_training_policy`
+
+```Python
+def build_training_policy(self):
+    with open(.../config.json) as f:
+        config = json.load(f)
+    training_policy = build_actor_critic(...)
+    self.training_policy = training_policy
+    self.training_policy_iteration = 0
+```
+
+- Loads model config.
+- Builds a fresh **student policy network**.
+
+##### 4. `load_latest_training_policy`
+
+```Python
+def load_latest_training_policy(self):
+    models = [file for file in os.listdir(self.training_policy_logdir) if 'model' in file]
+    ...
+    self.training_policy.load_state_dict(loaded_dict["model_state_dict"])
+```
+
+- Finds the newest saved model checkpoint.
+- Loads weights into `self.training_policy`.
+- Updates internal iteration counter.
+- Randomly samples mask `use_teacher_act_mask` → determines **which envs use teacher vs student actions**.
+
+##### 5. `get_transition`
+
+```Python
+def get_transition(self):
+    teacher_actions = self.get_policy_actions()
+    actions = self.training_policy.act(self.obs)
+    actions[self.use_teacher_act_mask] = teacher_actions[self.use_teacher_act_mask]
+    n_obs, n_critic_obs, rewards, dones, infos = self.env.step(actions)
+    return teacher_actions, rewards, dones, infos, n_obs, n_critic_obs
+```
+
+- Mixes actions:
+  - Student actions by default.
+  - Replaced with teacher actions based on mask.
+- **Teacher actions always label the trajectory.**
+
+##### 6. `add_transition`
+
+```Python
+def add_transition(self, step_i, infos):
+    if "episode" in infos:
+        self.rollout_episode_infos.append(infos["episode"])
+```
+
+- Saves episode info during rollouts.
+
+##### 7. `policy_reset`
+
+```Python
+def policy_reset(self, dones):
+    if dones.any():
+        self.training_policy.reset(dones)
+```
+
+- Resets both teacher and student policies when episodes end.
+
+##### 8. `check_stop`
+
+```Python
+def check_stop(self):
+    self.load_latest_training_policy()
+    return super().check_stop()
+```
+
+- Extends base stopping condition.
+- Ensures the latest student model is always loaded.
+
+##### 9. `print_log`
+
+```Python
+def print_log(self):
+    for key in self.rollout_episode_infos[0].keys():
+        ...
+        self.tb_writer.add_scalar('Episode/' + key, value, self.training_policy_iteration)
+```
+
+- Collects statistics from all rollout episodes.
+- Computes mean/max/min values.
+- Optionally logs them to TensorBoard.
+- Prints results in a table.
+- Increments student training iteration counter.
+
+####  Example Usage
+
+```Python
+from st_rl.datasets.dagger_saver import DaggerSaver
+
+# Initialize saver
+saver = DaggerSaver(
+    env=my_env,
+    save_dir="./dagger_demos",
+    training_policy_logdir="./student_policy",
+    teacher_act_prob="exp",
+    action_sample_std=0.1,
+    log_to_tensorboard=True
+)
+
+# Collect demonstrations
+saver.init_traj_handlers()
+for i in range(1000):
+    saver.load_latest_training_policy()
+    teacher_actions, rewards, dones, infos, obs, critic_obs = saver.get_transition()
+    saver.add_transition(i, infos)
+    if dones.any():
+        saver.policy_reset(dones)
+    if saver.check_stop():
+        break
+
+# Print episode statistics
+saver.print_log()
+```
+
+### 3.demonstration.py
+
+#### General Overview
+
+The `DemonstrationSaver` is a utility class designed to **collect demonstration data from an environment using a given policy** and save it into structured trajectory files. It handles trajectory segmentation, storage management, metadata tracking, and optional compression of observation segments.
+
+This tool is particularly useful in **imitation learning** and **offline** **reinforcement learning**, where high-quality datasets of agent–environment interactions are required.
+
+#### Key Components
+
+##### **Initialization**
+
+- `env` → The simulation environment (must provide `step`, `reset`, `get_observations`, etc.).
+- `policy` → Any policy object supporting:
+  - `act(obs, critic_obs)`
+  - `act_inference(obs, critic_obs)`
+  - `reset(dones)`
+  - (optional) `get_hidden_states()` if recurrent.
+- `save_dir` → Directory to store demonstration data.
+- `rollout_storage_length` → Number of steps per rollout buffer.
+- `min_timesteps` & `min_episodes` → Stopping conditions.
+- `success_traj_only` → If `True`, only saves non-timeout terminated trajectories.
+- `use_critic_obs` → Determines whether to use privileged critic observations for action selection.
+- `obs_disassemble_mapping` → Mapping for compressing observation segments.
+- `demo_by_sample` → If `True`, sample actions stochastically; otherwise, use deterministic inference.
+
+##### **Trajectory Management**
+
+- **`init_traj_handlers()`** Handles checkpointing of previously collected data. Ensures new runs can continue from existing trajectories.
+- **`update_traj_handler(env_i, step_slice)`** Updates trajectory index after an episode ends. Removes failed/timeout trajectories if required.
+- **`dump_to_file(env_i, step_slice)`** Saves a slice of trajectory into a `.pickle` file.
+- **`dump_metadata()`** Saves global metadata (`timesteps`, `trajectories`, configs).
+
+##### **Storage & Transition Handling**
+
+- **`init_storage_buffer()`** Initializes a rollout buffer for storing transitions (`RolloutStorage`).
+- **`collect_step(step_i)`** Runs one step: queries policy for actions → steps environment → builds + adds transition.
+- **`save_steps()`** Dumps rollouts into files whenever the buffer fills. Splits by `done` signals.
+- **`wrap_up_trajectory(env_i, step_slice)`** Prepares trajectory dictionary for saving, including compression of observation components if specified.
+
+##### **Policy Interaction**
+
+- **`get_policy_actions()`** Chooses actions based on:
+  - critic vs actor obs
+  - sampling vs deterministic inference
+- **`policy_reset(dones)`** Resets hidden states when environments finish.
+
+##### **Control Flow**
+
+- **`check_stop()`** → Determines whether collection should stop based on thresholds.
+- **`collect_and_save(config=None)`** → Main loop to collect rollouts, save them, and log progress.
+- **`print_log()`** → Prints progress (timesteps, throughput).
+- **`close()`** & **`del()`** → Cleanup, removing empty directories and finalizing metadata.
+
+####  Usage Notes
+
+- Use `obs_disassemble_mapping` if your observations contain large image-like tensors (e.g., `{"forward_rgb": "normalized_image"}`).
+- Set `success_traj_only=True` when generating expert datasets for imitation learning to avoid failed attempts.
+- Compatible with vectorized environments (`env.num_envs > 1`). Each environment gets its own trajectory folder.
+- Stores data in **pickle format** for easy reloading.
+- Metadata is always updated in `metadata.json`.
+
+1. ### on_policy_runner.py
+
+#### General Overview
+
+`OnPolicyRunner` is a training manager for **on-policy** **reinforcement learning** **algorithms** (e.g., PPO, APPO, TPPO). It handles:
+
+- Environment interaction (rollouts, resets).
+- Algorithm initialization and storage setup.
+- Training loop execution (rollout → update → evaluation → logging).
+- Logging with multiple backends (TensorBoard, WandB, Neptune).
+- Model saving/loading and checkpoint management.
+
+The class provides a full pipeline for training policies in simulated environments, from initialization to evaluation.
+
+#### Class Breakdown
+
+##### 🔹 `class OnPolicyRunner`
+
+Main class that orchestrates **on-policy RL training**.
+
+**Constructor**
+
+```Python
+def __init__(self, env: VecEnv, train_cfg, log_dir=None, device="cpu")
+```
+
+- **env** (`VecEnv`) → Vectorized environment wrapper.
+- **train_cfg** (dict) → Training configuration, containing `algorithm`, `policy`, and general hyperparameters.
+- **log_dir** (str, optional) → Path for logs and checkpoints.
+- **device** (str) → `"cpu"` or `"cuda"`.
+
+Responsibilities:
+
+- Initialize environment, algorithm, actor-critic model.
+- Configure rollout storage and observation normalization.
+- Prepare logging directories and git state tracking.
+
+##### 🔹 `init_writer`
+
+```Python
+def init_writter(self, init_at_random_ep_len: bool)
+```
+
+- Initializes the logging backend (`tensorboard`, `wandb`, or `neptune`).
+- Optionally randomizes starting episode lengths for training diversity.
+
+##### 🔹 `learn`
+
+```Python
+def learn(self, num_learning_iterations, init_at_random_ep_len=False, trial=None)
+```
+
+- Core training loop.
+- Steps:
+  - Collect rollouts (`rollout_step`).
+  - Compute returns.
+  - Update policy (`self.alg.update`).
+  - Evaluate and log metrics.
+  - Save checkpoints periodically.
+
+Returns:
+
+- Evaluation metrics (`velrmsd`, `CoT`).
+
+##### 🔹 `evaluation`
+
+```Python
+def evaluation(self)
+```
+
+- Computes evaluation metrics from the environment:
+  - `tracking_error` → RMSD of velocity.
+  - `CoT` → Cost of Transport.
+
+##### 🔹 `rollout_step`
+
+```Python
+def rollout_step(self, obs, critic_obs, **kwargs)
+```
+
+- Executes one environment step:
+  - Selects actions from policy.
+  - Advances environment.
+  - Normalizes observations.
+  - Passes step results to algorithm storage.
+
+##### 🔹 `log`
+
+```Python
+def log(self, locs, width=80, pad=35)
+```
+
+- Logs training statistics to console and configured writer.
+- Includes:
+  - Loss values, reward statistics, episode length.
+  - FPS, memory usage, learning rate.
+  - Evaluation metrics (`velrmsd`, `CoT`).
+
+##### 🔹 `save`
+
+```Python
+def save(self, path: str, infos=None)
+```
+
+- Saves model checkpoint:
+  - Algorithm weights.
+  - RND (Random Network Distillation) state if applicable.
+  - Training iteration number.
+
+##### 🔹 `load`
+
+```Python
+def load(self, path, load_optimizer=True, map_location=None)
+```
+
+- Loads model checkpoint.
+- Supports checkpoint manipulation (via `ckpt_manipulator`).
+- Restores iteration count and optional optimizer states.
+
+##### 🔹 `get_inference_policy`
+
+```Python
+def get_inference_policy(self, device=None)
+```
+
+- Returns a policy function for inference.
+- Ensures normalization and device placement.
+
+##### 🔹 Training/Eval Mode Helpers
+
+- `train_mode` → Sets networks to training mode.
+- `eval_mode` → Sets networks to evaluation mode.
+
+##### 🔹 Git Tracking
+
+```Python
+def add_git_repo_to_log(self, repo_file_path)
+```
+
+- Adds external repositories to the logging snapshot for reproducibility.
+
+### 5.two_stage_runner.py
+
+#### General Overview
+
+`TwoStageRunner` extends `OnPolicyRunner` to add a **two-stage training process**:
+
+1. **Pretraining Stage** — the agent collects transitions from a fixed demonstration dataset (`RolloutDataset`).
+2. **RL** **Stage** — the agent switches back to the normal on-policy rollout with environment interaction.
+
+This is typically used in **imitation learning +** **reinforcement learning** **hybrid training**, where demonstration data helps bootstrap learning before RL fine-tuning.
+
+#### Class & Methods
+
+##### `init(...)`
+
+- Calls the parent (`OnPolicyRunner`) constructor.
+- Loads configs related to pretraining:
+  - `pretrain_iterations` → how many iterations should use demonstration data before switching to RL.
+  - `log_interval` → logging frequency (default 50).
+  - Requires `pretrain_dataset` in the config (`assert` check).
+- Initializes a **`RolloutDataset`** with:
+  - Dataset config (`**self.cfg["pretrain_dataset"]`)
+  - Number of environments (`self.env.num_envs`)
+  - Device (`self.alg.device`)
+
+**Key role:** sets up dataset-driven pretraining.
+
+##### `rollout_step(obs, critic_obs)`
+
+Overrides the `OnPolicyRunner.rollout_step`.
+
+Behavior:
+
+- **If still in pretraining (****`current_learning_iteration < pretrain_iterations`****):**
+
+  - Fetch a batch from the demonstration dataset:
+
+  - ```Python
+    transition, infos = self.rollout_dataset.get_transition_batch()
+    ```
+
+  - Log performance stats from `infos` (except `time_outs`) under `Perf/dataset_*`.
+
+  - If a `transition` exists:
+
+    1. Feed it into the algorithm:
+
+    2. ```Python
+       self.alg.collect_transition_from_dataset(transition, infos)
+       ```
+
+    3. Return the transition fields: next obs, next privileged obs, reward, done, infos.
+
+  - If no transition is available:
+
+    1. Refresh observations from the environment (`env.get_observations()` / `env.get_privileged_observations()`).
+
+- **If outside pretraining:** Falls back to standard RL rollout:
+
+```Python
+return super().rollout_step(obs, critic_obs)
+```
+
+**Key role:** switches between dataset-driven rollouts (pretrain) and environment rollouts (RL).
+
+####  Key Points
+
+- `TwoStageRunner` is **compatible with** **`OnPolicyRunner`**, only overriding rollout behavior.
+- Useful for **demonstration-guided** **RL** (AMP, DAgger, behavior cloning + RL).
+- `RolloutDataset` supplies pre-collected transitions instead of calling `env.step()`.
+- Logging ensures dataset metrics are tracked alongside RL metrics.
+
+## Storage
+
+### 1.reply_buffer.py
+
+####  **Class: ReplayBuffer**
+
+##### Purpose
+
+- Stores experience data (here: **states** and **next states**) for reinforcement learning (RL).
+- Implements a **circular buffer (****ring buffer****)**: once full, new data overwrites the oldest data.
+- Provides a sampling function `feed_forward_generator` to draw mini-batches for training.
+
+#### **Constructor:** **`init`**
+
+```Python
+def __init__(self, obs_dim, buffer_size, device):
+    self.states = torch.zeros(buffer_size, obs_dim).to(device)
+    self.next_states = torch.zeros(buffer_size, obs_dim).to(device)
+    self.buffer_size = buffer_size
+    self.device = device
+
+    self.step = 0
+    self.num_samples = 0
+```
+
+##### Arguments
+
+- **obs_dim**: Dimension of each state vector.
+- **buffer_size**: Maximum number of entries the buffer can hold.
+- **device**: Device to store the tensors on (CPU or GPU).
+
+##### Internal variables
+
+- `self.states`: Stores current states (`[buffer_size, obs_dim]`).
+- `self.next_states`: Stores next states.
+- `self.step`: The current write index in the buffer.
+- `self.num_samples`: Number of valid samples currently in the buffer (≤ buffer_size).
+
+####  **Method:** **`insert`**
+
+```Python
+def insert(self, states, next_states):
+    num_states = states.shape[0]
+    start_idx = self.step
+    end_idx = self.step + num_states
+    ...
+```
+
+##### Purpose
+
+Insert a batch of states and their corresponding next states into the buffer.
+
+##### Logic
+
+1. **Determine the** **write** **range**: from `self.step` to `end_idx`.
+2. **Check if it exceeds buffer size**:
+   1. **Not exceeded** → write directly.
+   2. **Exceeded** → split writing into two parts:
+      - Fill from `self.step : buffer_size`.
+      - Wrap around and fill from the start `[0 : (end_idx - buffer_size)]`.
+3. **Update tracking**:
+   1. `self.num_samples`: updated to the number of valid samples (max capped at `buffer_size`).
+   2. `self.step`: advanced to the new write position (wrapped with modulo `% buffer_size`).
+
+#### **Method:** **`feed_forward_generator`**
+
+```Python
+def feed_forward_generator(self, num_mini_batch, mini_batch_size):
+    for _ in range(num_mini_batch):
+        sample_idxs = np.random.choice(self.num_samples, size=mini_batch_size)
+        yield (self.states[sample_idxs].to(self.device),
+               self.next_states[sample_idxs].to(self.device))
+```
+
+##### Purpose
+
+Randomly sample mini-batches of data for training.
+
+##### Arguments
+
+- **num_mini_batch**: Number of mini-batches to generate.
+- **mini_batch_size**: Number of samples per mini-batch.
+
+##### Logic
+
+1. Randomly pick `mini_batch_size` indices from the valid samples (`self.num_samples`).
+2. Collect the corresponding states and next states.
+3. Yield them one mini-batch at a time.
+
+### 2.rollout_storage.py
+
+#### **1.** **`RolloutStorage`**
+
+This is the **base class** for storing rollouts (trajectories) in reinforcement learning. It keeps all the data you need for PPO (or other policy gradient methods):
+
+- **Core storage**: observations, critic observations (privileged info), actions, rewards, dones.
+- **PPO-specific**: action log-probs, value predictions, returns, advantages, policy distribution parameters (μ, σ).
+- **Optional**: hidden states (for RNN policies).
+
+**Key features**:
+
+- `add_transitions()` → add one step of data.
+- `compute_returns()` → calculate GAE (generalized advantage estimation).
+- `mini_batch_generator()` → shuffle and sample minibatches.
+- `reccurent_mini_batch_generator()` → specialized batching for RNNs.
+- `get_statistics()` → average episode length + average reward.
+
+#### **2.** **`QueueRolloutStorage`** **(extends** **`RolloutStorage`****)**
+
+Adds support for a **rolling buffer** (like a queue), useful when the rollout length isn’t fixed.
+
+- Can **expand** the buffer size dynamically.
+- Can **loop** the buffer (new data overwrites old).
+- `untie_buffer_loop()` → reorders buffer so the latest data is continuous.
+- Designed for training with **buffered rollouts** instead of strict episode cuts.
+
+#### **3.** **`ActionLabelRollout`** **(extends** **`QueueRolloutStorage`****)**
+
+A variant that also stores **action labels** (e.g., for imitation learning).
+
+- Adds an extra `action_labels` tensor.
+- MiniBatch now includes `action_labels`.
+- Everything else works the same as `QueueRolloutStorage`.
+
+#### **4.** **`SarsaRolloutStorage`** **(extends** **`RolloutStorage`****)**
+
+Specialized for algorithms like **SARSA**, where you need both the **current state** and the **next state**.
+
+- Stores `next_observations` and `next_critic_observations`.
+- Uses an extended buffer (`all_observations`) so you can easily shift data by 1 timestep.
+- Ensures that each transition has `(s, a, r, s')` aligned.
+
+### 3.rollout_files
+
+#### 1.base.py
+
+##### **Class:** **`RolloutFileBase`**
+
+This is an **abstract base class** for datasets that load and serve **rollouts (trajectories / sequences)** from files. It inherits from `torch.utils.data.IterableDataset`, so you can iterate over it like a PyTorch dataset.
+
+It’s designed as a **template** — real implementations (subclasses) must implement the abstract methods (`reset_all`, `refresh_handlers`, `get_buffer`, `fill_transition`).
+
+##### **Key Attributes**
+
+- `data_dir` → where the rollout data is stored (file directory).
+- `num_envs` → how many environments (parallel envs / agents) to manage.
+- `device` → usually `"cuda"` or `"cpu"`.
+- `__initialized` → ensures lazy initialization (reset happens on first use).
+- `all_env_ids` → tensor with IDs `[0, 1, ..., num_envs-1]` representing environments.
+
+##### **Main Methods**
+
+###### **`reset(env_ids=None)`**
+
+- Resets rollout handlers.
+- If no env_ids given → reset **all environments**.
+- If env_ids provided → only refresh handlers for those envs.
+- (Useful when some envs terminate early but others keep running.)
+
+###### **`get_batch(num_transitions_per_env=None)`**
+
+- Fills a **buffer** with rollout data.
+- If `num_transitions_per_env=None` → returns a **single transition per** **env**.
+- Else → returns a sequence of transitions of length `num_transitions_per_env`.
+- Calls `fill_transition()` internally to populate the buffer.
+- First time it’s called, it will automatically call `reset()`.
+
+###### **`get_transition_batch()`**
+
+- Convenience method to simulate **environment stepping**.
+- Returns `(s, a, r, d, info)` transitions like a gym env.
+- If `"timeout"` field exists in buffer, wraps it in `{"time_outs": buffer.timeout}` for compatibility.
+
+###### **Dataset Interface (****`iter`****,** **`next`****)**
+
+- Allows iteration in PyTorch’s `DataLoader`.
+- `iter()` → resets the dataset.
+- `next()` → returns the next batch (via `get_batch()`).
+
+##### **Abstract Methods (must be implemented in subclasses)**
+
+1. **`reset_all()`**
+   1. Rebuild all handlers (e.g., file readers, trajectory pointers).
+   2. Reset envs to initial states.
+   3. Example: start reading from the first trajectory in each env.
+2. **`refresh_handlers(env_ids)`**
+   1. Reset only specific envs (e.g., when they hit end of trajectory).
+   2. Useful for multi-env training where envs finish episodes at different times.
+3. **`get_buffer(num_transitions_per_env=None)`**
+   1. Allocate an empty buffer (PyTorch tensor/dict) for transitions.
+   2. Shape depends on whether `num_transitions_per_env` is set.
+4. **`fill_transition(buffer, env_ids=None)`**
+   1. Actually **load transitions** from file into the buffer.
+   2. Advance the trajectory cursor (like stepping forward in a video).
+   3. Must include both current and **next observation**.
+   4. Data format per step should be `(s, a, r, d, ...)`.
+
+##### **High-level role**
+
+- Provides a **unified interface** for trajectory loading.
+- Can be used with:
+  - **offline RL** (load dataset of rollouts from disk).
+  - **imitation learning** (playback expert demonstrations).
+  - **hybrid methods** (mix real env + replay buffer + offline data).
+
+#### 2.rollout_dataset.py
+
+##### **Class Overview:** **`RolloutDataset`**
+
+- Inherits from **`RolloutFileBase`** (abstract base class for trajectory loaders).
+- Purpose: Load, manage, and feed **rollout (trajectory) data** from files into training (e.g., imitation learning, RL).
+- Handles multiple environments (`num_envs`), dataset looping, shuffling, and on-demand loading.
+- Maintains transitions in a **named** **tuple** (`Transition`) containing:
+  - `observation`, `privileged_observation`
+  - `action`, `reward`
+  - `done`, `timeout`
+  - `next_observation`, `next_privileged_observation`
+
+#####  **Constructor**
+
+```Python
+def __init__(self, data_dir, num_envs, dataset_loops=1, random_shuffle_traj_order=False, keep_latest_n_trajs=0, starting_frame_range=[0, 1], device="cuda"):
+```
+
+- **Args****:**
+  - `data_dir`: directory containing trajectories.
+  - `num_envs`: number of parallel environments.
+  - `dataset_loops`: how many times to loop dataset before stopping.
+  - `random_shuffle_traj_order`: whether to randomize trajectory order.
+  - `keep_latest_n_trajs`: only keep the most recent N trajectories.
+  - `starting_frame_range`: where to start inside a trajectory (random within range).
+  - `device`: `"cuda"` or `"cpu"`.
+- Initializes counters (`num_dataset_looped`) and configs.
+
+#####  **Data Reading & Preparation**
+
+```
+get_frame_range(filename)
+```
+
+- Extracts frame index range `(start, end)` from filename (e.g., `"traj_100_200.pkl"` → `(100, 200)`).
+
+```
+read_dataset_directory()
+```
+
+- Scans `data_dir` for trajectories (`trajectory_*` folders).
+- Loads and sorts trajectories by **modification time**.
+- Loads metadata (`metadata.json`) if present.
+- Keeps track of unused trajectories and supports random shuffling.
+- Returns `True` if enough data exists, otherwise waits.
+
+```
+assemble_obs_components(traj_data)
+```
+
+- Reconstructs observations from compressed components using metadata.
+- Concatenates different observation parts into a full observation tensor.
+
+##### **Handler Management**
+
+```
+reset_all()
+```
+
+- Clears all handlers.
+- Ensures dataset directory is valid and trajectories exist.
+- Initializes tracking structures for each environment: identifiers, file names, lengths, cursors, etc.
+- Calls `refresh_handlers()` to assign initial trajectories.
+
+```
+_refresh_traj_data(env_idx)
+```
+
+- Loads a specific **trajectory file** for a given environment.
+- Converts numpy arrays → PyTorch tensors (on `device`).
+- Optionally reconstructs observations from compressed components.
+
+```
+_refresh_traj_handler(env_idx)
+```
+
+- Assigns a trajectory to an environment.
+- Randomizes starting frame (within `starting_frame_range`).
+- Ensures the cursor is within a valid file.
+- Marks the first frame as `done=True`.
+
+```
+refresh_handlers(env_ids)
+```
+
+- Refreshes trajectory handlers for selected envs.
+- Assigns unused trajectory IDs to them.
+
+```
+_maintain_handler(env_idx)
+```
+
+- Maintains trajectory progress.
+- If one trajectory finishes → loads next one.
+- Handles looping if dataset ends and `dataset_loops > 1`.
+
+##### **Buffer & Transition Filling**
+
+```
+get_buffer(num_transitions_per_env=None)
+```
+
+- Builds an **output transition buffer** (`Transition` tuple) with required shape.
+- Pre-allocates tensors for efficiency (observations, actions, rewards, dones, etc.).
+- Supports both single-step and multi-step (time-major) format.
+
+```
+_fill_transition_per_env(buffer, env_idx)
+```
+
+- Writes a **single environment’s transition** into buffer.
+- Handles:
+  - Copying observation, privileged observation, action, reward, done, timeout.
+  - Advancing trajectory cursor.
+  - Loading next trajectory when current is exhausted.
+- Ensures **next_observation** is also filled.
+
+```
+fill_transition(buffer, env_ids=None)
+```
+
+- Iterates over environments and fills each env’s transition into the buffer.
+- If `env_ids` is `None`, processes all environments.
+
+##### **How It Works in Training**
+
+1. On reset: scans directories, loads available trajectories, sets handlers.
+2. On `get_batch`: requests a batch of transitions.
+3. On `fill_transition`: loads actual `(s, a, r, d, next_s)` from trajectories.
+4. Iteratively feeds these batches into RL training.
