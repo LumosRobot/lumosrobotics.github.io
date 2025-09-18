@@ -13,7 +13,7 @@ This guide will walk you through the process of retargeting human motion capture
 
 ## 1.1 Create a Conda Environment
 
-``` python
+``` bash
 # Create environment
 conda create -n retarget python=3.8
 
@@ -23,7 +23,7 @@ conda activate retarget
 
 ## 1.2 Install dependencies
 
-``` python
+``` bash
 # Install PyTorch with CUDA
 conda install pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
 
@@ -48,7 +48,7 @@ Download the[SMPL](https://smpl.is.tue.mpg.de/)  **v1.1.0** model parameters and
 
 Expected directory:
 
-``` python
+``` plain
 |-- data
     |-- smpl
         |-- SMPL_FEMALE.pkl
@@ -70,7 +70,7 @@ Decompress the datasets into `data/AMASS/`.
 
 The `sources/data/` directory should look like this:
 
-```Bash
+``` plain
 sources/data/
     ├── AMASS/       # Motion datasets (AMASS/CMU/Taichi, etc.)
     ├── assets/      # Robot assets, meshes, URDF, and MJCF files
@@ -107,7 +107,7 @@ cd sources/
 
 ### Step One: Fit SMPL Shape to Robot Joints
 
-```Bash
+``` bash
 python fit_smpl_shape.py robot=lumos_lus2_joint27_fitting
 ```
 
@@ -121,7 +121,7 @@ Purpose: Align SMPL body shape with Lus2 joint configuration.
 
 ### Step Two: Motion Retargeting from AMASS
 
-```Bash
+``` bash
 python fit_smpl_motion.py robot=lumos_lus2_joint27_fitting +motion_name=CMU_CMU_13_13_21_poses
 ```
 
@@ -135,7 +135,7 @@ Purpose: Map human trajectories from AMASS onto Lus2 robot joints.
 
 The motion file corresponds to:
 
-```Bash
+``` bash
 humanoid_demo_retarget/data/AMASS/CMU/
 └── CMU
     └── 13
@@ -146,7 +146,7 @@ humanoid_demo_retarget/data/AMASS/CMU/
 
 ### Step Three: Visualization
 
-```Bash
+``` bash
 python vis_data/vis_mj.py robot=lumos_lus2_joint27_fitting +motion_name=CMU_CMU_13_13_21_poses
 ```
 
@@ -165,7 +165,7 @@ Instead of running multiple Python scripts manually, Lumos RL Workspace provides
 
 - **Shape Fitting**
 
-``` python
+``` bash
 ./run.sh -r lumos_lus2_joint27 -s
 ```
 
@@ -175,7 +175,7 @@ Instead of running multiple Python scripts manually, Lumos RL Workspace provides
 
 - **Motion Retargeting**
 
-``` python
+``` bash
 ./run.sh -r lumos_lus2_joint21 -f -m CMU_CMU_13_13_21_poses
 ```
 
@@ -185,7 +185,7 @@ Instead of running multiple Python scripts manually, Lumos RL Workspace provides
 
 - **Visualization**
 
-``` python
+``` bash
 ./run.sh -r lumos_lus2_joint27 -v -m CMU_CMU_13_13_21_poses
 ```
 
@@ -193,7 +193,7 @@ Instead of running multiple Python scripts manually, Lumos RL Workspace provides
 
 - **Full Pipeline (Recommended)**
 
-``` python
+``` bash
 ./run.sh -r lumos_lus2_joint27 -s -f -v -m CMU_CMU_13_13_21_poses
 ```
 
@@ -211,7 +211,7 @@ This one-line command is recommended for running the entire process end-to-end.
 
 Flags can be combined in any order:
 
-``` python
+``` bash
 ./run.sh -r lumos_lus2_joint27 -sfvm CMU_CMU_13_13_21_poses
 ./run.sh -r lumos_lus2_joint27 -vsf -m CMU_CMU_13_13_21_poses
 ```
@@ -224,7 +224,7 @@ YAML files (`data/cfg/robot/`) define **retargeting setup**: how SMPL joints map
 
 Example:
 
-```Bash
+``` bash
 data/cfg/robot/lumos_lus2_joint27_fitting.yaml
 ```
 
@@ -267,7 +267,7 @@ This project builds upon the  [**PHC (Perpetual Humanoid Control)**](https://git
 
 If you find this work useful for your research, please consider citing:
 
-```Bash
+``` bash
 @inproceedings{Luo2023PerpetualHC,
     author={Zhengyi Luo and Jinkun Cao and Alexander W. Winkler and Kris Kitani and Weipeng Xu},
     title={Perpetual Humanoid Control for Real-time Simulated Avatars},

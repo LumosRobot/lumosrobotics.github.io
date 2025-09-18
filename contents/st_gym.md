@@ -15,7 +15,7 @@ nav_order: 5
 
 The structure of st_gym:
 
-```Python
+``` bash
 st_gym
 ├── exts
 │   └── legged_robots
@@ -52,21 +52,17 @@ st_gym
 
 Configuration files for different environments and algorithms are located in:
 
+``` bash
 st_gym/exts/legged_robots/tasks/config/
 
 └── lus2/
-
 ​    ├── agents/
-
 ​    │   └── st_rl_ppo_cfg.py       # PPO training parameters
-
 ​    ├── __init__.py                     # register train and play environments
-
 ​    ├── flat_env_cfg.py              # Flat configuration
-
 ​    ├── rough_env_cfg.py          # Rough configuration
-
 ​    └── amp_mimic_cfg.py         # Motion data, AMP and mimic configuration
+``` 
 
 To modify motion sources or environmental properties, edit the corresponding files above.
 

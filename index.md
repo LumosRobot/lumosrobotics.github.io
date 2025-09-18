@@ -52,7 +52,7 @@ Example Result Video: Retargeted human motion trajectory executed on Lus2.
   <p><b>Figure: Comparison of Retargeted Motion (CMU_CMU_13_13_21_poses)</b></p>
 </div>
 
-## 2. Policy Training
+## 2. Policy Training and Play
 - Focus: Reinforcement learning–based policy for humanoid robots.
 - Framework: Built on st_gym (Isaac Sim–based environments) and st_rl (RL algorithms).
 - Key Features:

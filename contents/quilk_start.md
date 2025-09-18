@@ -41,7 +41,7 @@ git clone https://github.com/sunzhon/refmotion_manager.git
 
 **Project structure**
 
-``` Plain
+``` plain
 workspace
 ├── IsaacLab
 └── lumos_ws
@@ -160,7 +160,7 @@ Or use run.sh:
 
 Logs are saved to:
 
-``` Plain
+``` plain
 st_gym/logs/st_rl/lus2_flat/yyyy-mm-dd_hh-mm-ss
 ```
 

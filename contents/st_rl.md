@@ -25,7 +25,7 @@ This is the **foundation**: later, `APPO` extends this base PPO by adding advers
 
 ###### 1.Imports and class definition
 
-```Python
+``` python
 from collections import defaultdict
 
 import torch
@@ -60,7 +60,7 @@ class PPO:
 
 ###### 2.Initialization (__init__)
 
-```Python
+``` python
 def __init__(self,
              actor_critic,
              num_learning_epochs=1,
@@ -97,7 +97,7 @@ def __init__(self,
 
 ###### 3.Observation normalization
 
-```Python
+``` python
 def init_obs_norm(self, num_obs, num_critic_obs):
     if self.empirical_normalization:
         self.obs_normalizer = EmpiricalNormalization(shape=[num_obs], until=1.0e8).to(self.device)
@@ -114,7 +114,7 @@ def init_obs_norm(self, num_obs, num_critic_obs):
 
 ###### 4.Rollout storage
 
-```Python
+``` python
 def init_storage(self, num_envs, num_transitions_per_env, actor_obs_shape, critic_obs_shape, action_shape, **kwargs):
     self.transition = RolloutStorage.Transition()
     self.storage = RolloutStorage(num_envs, num_transitions_per_env, actor_obs_shape, critic_obs_shape, action_shape, self.device, **kwargs)
@@ -125,7 +125,7 @@ def init_storage(self, num_envs, num_transitions_per_env, actor_obs_shape, criti
 
 ###### 5.Acting (act)
 
-```Python
+``` python
 def act(self, obs, critic_obs):
     if self.actor_critic.is_recurrent:
         self.transition.hidden_states = self.actor_critic.get_hidden_states()
@@ -150,7 +150,7 @@ def act(self, obs, critic_obs):
 
 ###### 6.Processing environment step (process_env_step)
 
-```Python
+``` python
 def process_env_step(self, rewards, dones, infos):
     self.transition.rewards = rewards.clone()
     self.transition.dones = dones
@@ -172,7 +172,7 @@ def process_env_step(self, rewards, dones, infos):
 
 ###### 7.Compute returns (compute_returns)
 
-```Python
+``` python
 def compute_returns(self, last_critic_obs):
     last_values = self.actor_critic.evaluate(last_critic_obs).detach()
     self.storage.compute_returns(last_values, self.gamma, self.lam)
@@ -184,7 +184,7 @@ def compute_returns(self, last_critic_obs):
 
 ###### 8.Update loop (update)
 
-```Python
+``` python
 def update(self, current_learning_iteration):
     self.current_learning_iteration = current_learning_iteration
     mean_losses = defaultdict(lambda :0.)
@@ -233,7 +233,7 @@ def update(self, current_learning_iteration):
 
 ###### 9.Compute losses (compute_losses)
 
-```Python
+``` python
 def compute_losses(self, minibatch):
     self.actor_critic.act(minibatch.obs, masks=minibatch.masks, 
                             hidden_states= minibatch.hidden_states.actor if minibatch.hidden_states is not None else None)
@@ -252,7 +252,7 @@ def compute_losses(self, minibatch):
 - `mu_batch`, `sigma_batch`: mean and std of the policy distribution.
 - `entropy_batch`: entropy of policy distribution, used as an exploration bonus.
 
-```Python
+``` python
     # KL
     if self.desired_kl != None and self.schedule == 'adaptive':
         with torch.inference_mode():
@@ -276,7 +276,7 @@ def compute_losses(self, minibatch):
   - KL too small → increase learning rate.
 - Helps keep policy updates stable.
 
-```Python
+``` python
     # KL
     if self.desired_kl != None and self.schedule == 'adaptive':
         with torch.inference_mode():
@@ -300,7 +300,7 @@ def compute_losses(self, minibatch):
   - KL too small → increase learning rate.
 - Helps keep policy updates stable.
 
-```Python
+``` python
     # Surrogate loss
     ratio = torch.exp(actions_log_prob_batch - torch.squeeze(minibatch.old_actions_log_prob))
     surrogate = -torch.squeeze(minibatch.advantages) * ratio
@@ -314,7 +314,7 @@ def compute_losses(self, minibatch):
   - surrogate_clipped: same, but ratio is clipped.
   - Final loss = maximum of unclipped vs clipped loss (conservative update).
 
-```Python
+``` python
     # Value function loss
     if self.use_clipped_value_loss:
         value_clipped = minibatch.values + (value_batch - minibatch.values).clamp(-self.clip_param, self.clip_param)
@@ -328,7 +328,7 @@ def compute_losses(self, minibatch):
 - Value loss: mean squared error between predicted values and returns.
 - Optionally uses clipped value loss to prevent large shifts in value function predictions.
 
-```Python
+``` python
     return_ = dict(
         surrogate_loss= surrogate_loss,
         value_loss= value_loss,
@@ -355,7 +355,7 @@ Returns:
 
 ###### 10.Save and load state
 
-```Python
+``` python
 def state_dict(self):
     state_dict = {
         "model_state_dict": self.actor_critic.state_dict(),
@@ -375,7 +375,7 @@ def state_dict(self):
 - Saves model weights, optimizer state, scheduler, and normalizers (if used).
 - Used for checkpointing.
 
-```Python
+``` python
 def load_state_dict(self, state_dict):
     resumed_trianing = self.actor_critic.load_state_dict(state_dict["model_state_dict"])
 
@@ -424,7 +424,7 @@ def load_state_dict(self, state_dict):
 
 #####  Utility Functions
 
-```Python
+``` python
 def GET_PROB_FUNC(option, iteration_scale):
     PROB_options = {
         "linear": (lambda x: max(0, 1 - 1 / iteration_scale * x)),
@@ -449,7 +449,7 @@ def GET_PROB_FUNC(option, iteration_scale):
 
 ###### 1.Imports and utility function
 
-```Python
+``` python
  import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -473,7 +473,7 @@ from st_rl.modules import EmpiricalNormalization
 
 ###### 2.`APPOAlgoMixin` (Mixin for adversarial imitation) 
 
-```Python
+``` python
 class APPOAlgoMixin:
     def __init__(
         self,
@@ -501,7 +501,7 @@ class APPOAlgoMixin:
 
 ###### 3.Storage initialization
 
-```Python
+``` python
 def init_storage(self, *args, **kwargs):
     self.transition = AmpRolloutStorage.Transition()
     self.storage = AmpRolloutStorage(*args, **kwargs)
@@ -512,7 +512,7 @@ def init_storage(self, *args, **kwargs):
 
 ###### 4.Acting (`act` override)
 
-```Python
+``` python
 def act(self, obs, critic_obs):
     return_ = super().act(obs, critic_obs)  # return is transition.actions
     self.transition.action_labels = return_
@@ -525,7 +525,7 @@ def act(self, obs, critic_obs):
 
 ###### 5.Processing environment step
 
-```Python
+``` python
 def process_env_step(self, rewards, dones, infos):
     assert "observations" in infos and "ref_obs" in infos["observations"], "Missing ref_obs in infos"
     ref_obs = infos["observations"]["ref_obs"]
@@ -557,7 +557,7 @@ def process_env_step(self, rewards, dones, infos):
 
 ###### 6.Compute losses (compute_losses)
 
-```Python
+``` python
 def compute_losses(self, minibatch):
     losses, inter_vars, stats = super().compute_losses(minibatch)
 ```
@@ -565,7 +565,7 @@ def compute_losses(self, minibatch):
 - First, calls the parent class (`PPO` or `TPPO`) `compute_losses`.
 - This gives the standard PPO losses: surrogate loss, value loss, entropy.
 
-```Python
+``` python
 if hasattr(self, "dagger_loss_coef"):
     if self.dagger_loss_coef != 0:
         dagger_loss = torch.norm(
@@ -579,7 +579,7 @@ if hasattr(self, "dagger_loss_coef"):
   - Add this as dagger_loss.
 - Used for imitation learning with expert supervision.
 
-```Python
+``` python
 if hasattr(self, "mimic_loss_coef"):
     if self.mimic_loss_coef != 0:
         policy_state = minibatch.ref_obs
@@ -593,7 +593,7 @@ if hasattr(self, "mimic_loss_coef"):
 - Computes **mimic loss**: L2 distance between policy’s reference obs and expert reference motion.
 - Encourages the agent to mimic the expert states more closely.
 
-```Python
+``` python
 if hasattr(self.actor_critic, "discriminator"):
     if self.discriminator_loss_coef != 0:
         policy_state = minibatch.ref_obs
@@ -622,7 +622,7 @@ if hasattr(self.actor_critic, "discriminator"):
 
 ###### 7.Return values
 
-```Python
+``` python
 return losses, inter_vars, stats
 ```
 
@@ -630,7 +630,7 @@ return losses, inter_vars, stats
 
 ###### 8.APPO class
 
-```Python
+``` python
 class APPO(APPOAlgoMixin, PPO):
     """
     APPO (Adversarial Proximal Policy Optimization)
@@ -648,7 +648,7 @@ class APPO(APPOAlgoMixin, PPO):
 
 ###### 9.ATPPO class
 
-```Python
+``` python
 class ATPPO(APPOAlgoMixin, TPPO):
     """
     ATPPO (Adversarial Temporal PPO)
@@ -683,7 +683,7 @@ class ATPPO(APPOAlgoMixin, TPPO):
 
 Utility function: `GET_PROB_FUNC`
 
-```Python
+``` python
 def GET_PROB_FUNC(option, iteration_scale):
     PROB_options = {
         "linear": (lambda x: max(0, 1 - 1 / iteration_scale * x)),
@@ -704,7 +704,7 @@ def GET_PROB_FUNC(option, iteration_scale):
 
 ###### 1.Initialization
 
-```Python
+``` python
 class TPPO(PPO):
     def __init__(self,
             *args,
@@ -741,7 +741,7 @@ class TPPO(PPO):
 
 ###### 2.Teacher policy setup
 
-```Python
+``` python
 teacher_actor_critic = getattr(modules, teacher_policy["class_name"])(**teacher_policy)
 if teacher_policy["teacher_ac_path"] is not None:
     state_dict = torch.load(teacher_policy["teacher_ac_path"], map_location= "cpu")
@@ -760,7 +760,7 @@ self.teacher_actor_critic.eval()
 
 ###### 3.Storage
 
-```Python
+``` python
 def init_storage(self, *args, **kwargs):
     self.transition = ActionLabelRollout.Transition()
     self.storage = ActionLabelRollout(
@@ -775,7 +775,7 @@ def init_storage(self, *args, **kwargs):
 
 ###### 4.Acting
 
-```Python
+``` python
 def act(self, obs, critic_obs):
     return_ = super().act(obs, critic_obs) 
     ...
@@ -791,7 +791,7 @@ def act(self, obs, critic_obs):
 
 ###### 5.Environment step
 
-```Python
+``` python
 def process_env_step(self, rewards, dones, infos):
     return_ = super().process_env_step(rewards, dones, infos)
     self.teacher_actor_critic.reset(dones)
@@ -806,7 +806,7 @@ def process_env_step(self, rewards, dones, infos):
 
 ###### 6.Distillation loss (core)
 
-```Python
+``` python
 def compute_losses(self, minibatch):
     if self.using_ppo:
         losses, inter_vars, stats = super().compute_losses(minibatch)
@@ -830,7 +830,7 @@ def compute_losses(self, minibatch):
 
 ###### 7. Latent distillation
 
-```Python
+``` python
 if self.distill_latent_obs_component_mapping is not None:
     for k, v in self.distill_latent_obs_component_mapping.items():
         latent = self.actor_critic.get_encoder_latent(minibatch.obs, k)
@@ -856,7 +856,7 @@ if self.distill_latent_obs_component_mapping is not None:
 
 #####   Utility Functions
 
-```Python
+``` python
 from st_rl.utils.utils import unpad_trajectories, get_subobs_by_components
 from st_rl.storage.rollout_storage import SarsaRolloutStorage
 ```
@@ -869,7 +869,7 @@ from st_rl.storage.rollout_storage import SarsaRolloutStorage
 
 ###### 1.EstimatorAlgoMixin
 
-```Python
+``` python
 class EstimatorAlgoMixin:
     """ A supervised algorithm implementation that trains a state predictor in the policy model """
 ```
@@ -879,7 +879,7 @@ class EstimatorAlgoMixin:
 
 ###### 2.Initialization
 
-```Python
+``` python
 def __init__(self,
         *args,
         estimator_loss_func= "mse_loss",
@@ -902,7 +902,7 @@ Initializes estimator configs:
 
 ###### 3.compute_losses
 
-```Python
+``` python
 def compute_losses(self, minibatch):
     losses, inter_vars, stats = super().compute_losses(minibatch)
 ```
@@ -910,7 +910,7 @@ def compute_losses(self, minibatch):
 - Calls parent PPO/TPPO’s `compute_losses` first.
 - Adds estimation loss on top.
 
-```Python
+``` python
 estimation_target = get_subobs_by_components(
     minibatch.critic_obs,
     component_names= self.estimator_target_obs_components,
@@ -923,14 +923,14 @@ if self.actor_critic.is_recurrent:
 - Extracts the target state from critic observations.
 - For recurrent models, unpads trajectories.
 
-```Python
+``` python
 estimation = unpad_trajectories(self.actor_critic.get_estimated_state(), minibatch.masks)
 ```
 
 - Gets the predicted state from the policy’s estimator head.
 - Also unpads if recurrent.
 
-```Python
+``` python
 estimator_loss = getattr(F, self.estimator_loss_func)(
     estimation,
     estimation_target,
@@ -943,7 +943,7 @@ estimator_loss = getattr(F, self.estimator_loss_func)(
 - `reduction="none"` → loss per sample.
 - Sum over feature dimension.
 
-```Python
+``` python
 losses["estimator_loss"] = estimator_loss.mean()
 return losses, inter_vars, stats
 ```
@@ -953,7 +953,7 @@ return losses, inter_vars, stats
 
 ###### 4.EstimatorPPO
 
-```Python
+``` python
 class EstimatorPPO(EstimatorAlgoMixin, PPO):
     pass
 ```
@@ -963,7 +963,7 @@ class EstimatorPPO(EstimatorAlgoMixin, PPO):
 
 ###### 5.EstimatorTPPO
 
-```Python
+``` python
 class EstimatorTPPO(EstimatorAlgoMixin, TPPO):
     pass
 ```
@@ -983,7 +983,7 @@ This module defines the *Actor-Critic architecture* used in reinforcement learni
 
 ###### 1.`ActorCritic`
 
-```Python
+``` python
 class ActorCritic(nn.Module):
     def __init__(self, obs_dim, act_dim):
         super().__init__()
@@ -1016,7 +1016,7 @@ class ActorCritic(nn.Module):
 
 ###### 2.`Actor`
 
-```Python
+``` python
 class Actor(nn.Module):
     def __init__(self, obs_dim, act_dim):
         super().__init__()
@@ -1042,7 +1042,7 @@ class Actor(nn.Module):
 
 ###### 3.`Critic`
 
-```Python
+``` python
 class Critic(nn.Module):
     def __init__(self, obs_dim):
         super().__init__()
@@ -1083,7 +1083,7 @@ In the PPO/APPO training loop, these classes are used as **policy managers** tha
 
 ###### 1.`ActorCriticFieldMutex`
 
-```Python
+``` python
 class ActorCriticFieldMutex(ActorCriticMutex):
     def __init__(self,
             *args,
@@ -1099,7 +1099,7 @@ class ActorCriticFieldMutex(ActorCriticMutex):
 - Adds **velocity command overrides**, **policy selection smoothing**, and **reset logic**.
 - Loads `cmd_scales` from sub-policy configs for normalization.
 
-```Python
+``` python
 def resample_cmd_vel_current(self, dones=None):
     ...
 ```
@@ -1108,7 +1108,7 @@ def resample_cmd_vel_current(self, dones=None):
 - Supports fixed values or random values (if tuple given).
 - If `dones` is provided, applies batchwise updates.
 
-```Python
+``` python
 def recover_last_action(self, observations, policy_selection):
     ...
 ```
@@ -1116,7 +1116,7 @@ def recover_last_action(self, observations, policy_selection):
 - Recovers action scaling when sub-policies use different action scales.
 - Ensures consistency of proprioception inputs across sub-policies.
 
-```Python
+``` python
 def get_policy_selection(self, observations):
     ...
 ```
@@ -1124,7 +1124,7 @@ def get_policy_selection(self, observations):
 - Extracts `engaging_block` observation and returns a **one-hot policy ID**.
 - If no obstacle is detected, defaults to the first policy.
 
-```Python
+``` python
 def override_cmd_vel(self, observations, policy_selection):
     ...
 ```
@@ -1132,7 +1132,7 @@ def override_cmd_vel(self, observations, policy_selection):
 - Overrides velocity commands in the proprioception observation.
 - Uses `cmd_scales` for proper normalization.
 
-```Python
+``` python
 @torch.no_grad()
 def act_inference(self, observations):
     ...
@@ -1143,7 +1143,7 @@ def act_inference(self, observations):
 - Combines outputs with scaling factors.
 - Resets non-selected sub-policies according to config (`all` / `when_skill`).
 
-```Python
+``` python
 @torch.no_grad()
 def reset(self, dones=None):
     ...
@@ -1154,7 +1154,7 @@ def reset(self, dones=None):
 
 ###### 2.`ActorCriticClimbMutex`
 
-```Python
+``` python
 class ActorCriticClimbMutex(ActorCriticFieldMutex):
     """ A variant to handle jump-up and jump-down with seperate policies """
     JUMP_OBSTACLE_ID = 3
@@ -1165,7 +1165,7 @@ class ActorCriticClimbMutex(ActorCriticFieldMutex):
 - Adds a **jump-down policy** (last submodule).
 - Handles velocity override logic for jump-down.
 
-```Python
+``` python
 def resample_cmd_vel_current(self, dones=None):
     ...
 ```
@@ -1174,7 +1174,7 @@ def resample_cmd_vel_current(self, dones=None):
 - Ensures the last policy (jump-down) has correct velocity.
 - Supports fixed / random velocity ranges.
 
-```Python
+``` python
 def get_policy_selection(self, observations):
     ...
 ```
@@ -1200,7 +1200,7 @@ This module defines the **ActorCriticMutex** class, which extends the base `Acto
 
 ###### 1.`ActorCriticMutex.__init__`
 
-```Python
+``` python
 def __init__(self,
             num_actor_obs,
             num_critic_obs,
@@ -1220,7 +1220,7 @@ def __init__(self,
 - Registers `subpolicy_action_scale` for normalizing actions.
 - Checks for recurrent sub-policies and sets `self.is_recurrent`.
 
-```Python
+``` python
 self.submodules = nn.ModuleList()
 for subpolicy_idx, sub_path in enumerate(sub_policy_paths):
     with open(osp.join(sub_path, "config.json"), "r") as f:
@@ -1242,7 +1242,7 @@ for subpolicy_idx, sub_path in enumerate(sub_policy_paths):
 
 ###### 2.`reset()`
 
-```Python
+``` python
 def reset(self, dones=None):
     for module in self.submodules:
         module.reset(dones)
@@ -1253,7 +1253,7 @@ def reset(self, dones=None):
 
 ###### 3.`act()` 与 `act_inference()`
 
-```Python
+``` python
 def act(self, observations, **kwargs):
     raise NotImplementedError("Please make figure out how to load the hidden_state from exterior maintainer.")
 
@@ -1266,7 +1266,7 @@ def act_inference(self, observations):
 
 ###### 4.`subpolicy_action_scale registration`
 
-```Python
+``` python
 self.register_buffer(
     "subpolicy_action_scale_{:d}".format(subpolicy_idx),
     torch.tensor(run_kwargs["control"]["action_scale"]) \
@@ -1295,14 +1295,14 @@ This module extends the **Actor-Critic framework** with **recurrent memory** usi
 
 ###### 1.`ActorCriticRecurrent`
 
-```Python
+``` python
 class ActorCriticRecurrent(ActorCritic):
     is_recurrent = True
 ```
 
 -  A recurrent version of `ActorCritic`, with RNN layers (GRU/LSTM) inserted before the standard actor and critic MLP networks.
 
-```Python
+``` python
 def __init__(self, num_actor_obs, num_critic_obs, num_actions,
              actor_hidden_dims=[256, 256, 256],
              critic_hidden_dims=[256, 256, 256],
@@ -1319,7 +1319,7 @@ def __init__(self, num_actor_obs, num_critic_obs, num_actions,
 - Uses separate memory modules for actor (`memory_a`) and critic (`memory_c`).
 - Sets RNN hidden size and layers.
 
-```Python
+``` python
 def reset(self, dones=None):
     self.memory_a.reset(dones)
     self.memory_c.reset(dones)
@@ -1328,7 +1328,7 @@ def reset(self, dones=None):
 - Resets the hidden states for both actor and critic memories.
 - Accepts `dones` mask to selectively reset only terminated environments.
 
-```Python
+``` python
 def act(self, observations, masks=None, hidden_states=None):
     input_a = self.memory_a(observations, masks, hidden_states)
     return super().act(input_a)
@@ -1337,7 +1337,7 @@ def act(self, observations, masks=None, hidden_states=None):
 - Passes observations through the actor RNN (`memory_a`).
 - Calls the parent `ActorCritic.act()` with processed inputs.
 
-```Python
+``` python
 def act_inference(self, observations):
     input_a = self.memory_a(observations)
     return super().act_inference(input_a)
@@ -1346,7 +1346,7 @@ def act_inference(self, observations):
 - Inference-only version of `act()`.
 - For rollout without exploration noise.
 
-```Python
+``` python
 def evaluate(self, critic_observations, masks=None, hidden_states=None):
     input_c = self.memory_c(critic_observations, masks, hidden_states)
     return super().evaluate(input_c)
@@ -1355,7 +1355,7 @@ def evaluate(self, critic_observations, masks=None, hidden_states=None):
 - Processes critic observations with RNN (`memory_c`).
 - Evaluates critic value function with sequential input.
 
-```Python
+``` python
 def get_hidden_states(self):
     return ActorCriticHiddenState(self.memory_a.hidden_states, self.memory_c.hidden_states)
 ```
@@ -1365,7 +1365,7 @@ def get_hidden_states(self):
 
 ###### 2.`Memory`
 
-```Python
+``` python
 class Memory(torch.nn.Module):
     def __init__(self, input_size, type='lstm', num_layers=1, hidden_size=256):
         ...
@@ -1373,7 +1373,7 @@ class Memory(torch.nn.Module):
 
 - Encapsulates an RNN (`LSTM` or `GRU`) with hidden state management.
 
-```Python
+``` python
 rnn_cls = nn.GRU if type.lower() == 'gru' else nn.LSTM
 self.rnn = rnn_cls(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers)
 self.hidden_states = None
@@ -1385,7 +1385,7 @@ self.hidden_states = None
 
 ###### 3.`ActorCriticHiddenState` & `LstmHiddenState`
 
-```Python
+``` python
 ActorCriticHiddenState = namedarraytuple('ActorCriticHiddenState', ['actor', 'critic'])
 LstmHiddenState = namedarraytuple('LstmHiddenState', ['hidden', 'cell'])
 ```
@@ -1416,7 +1416,7 @@ It provides modular, reusable policy classes with extended functionality (encodi
 
 ###### 1.`EncoderStateAc`
 
-```Python
+``` python
 class EncoderStateAc(EstimatorMixin, EncoderActorCriticMixin, ActorCritic):
     pass
 ```
@@ -1426,7 +1426,7 @@ class EncoderStateAc(EstimatorMixin, EncoderActorCriticMixin, ActorCritic):
 
 ###### 2.`EncoderStateAcRecurrent`
 
-```Python
+``` python
 class EncoderStateAcRecurrent(EstimatorMixin, EncoderActorCriticMixin, ActorCriticRecurrent):
     
     def load_misaligned_state_dict(self, module, obs_segments, critic_obs_segments=None):
@@ -1461,7 +1461,7 @@ This module integrates **Adversarial Motion Priors (AMP)** into the Actor-Critic
 
 ###### 1.`AMPDiscriminator`
 
-```Python
+``` python
 class AMPDiscriminator(nn.Module):
     def __init__(self, input_dim, style_reward_coef, hidden_dims, task_reward_lerp=0.0, discriminator_grad_pen=5, **kwargs)
 ```
@@ -1478,7 +1478,7 @@ class AMPDiscriminator(nn.Module):
 
 ###### 2.`AmpMixin`
 
-```Python
+``` python
 class AmpMixin:
     def __init__(..., **kwargs):
         super().__init__(...)
@@ -1491,7 +1491,7 @@ class AmpMixin:
 
 ###### 3. `AmpActorCritic` / `AmpActorCriticRecurrent`
 
-```Python
+``` python
 class AmpActorCritic(AmpMixin, ActorCritic):
     pass
 
@@ -1520,7 +1520,7 @@ This file defines convolutional model components used in `st_rl` to process visu
 
 ###### 1.`Conv2dModel`
 
-```Python
+``` python
 class Conv2dModel(torch.nn.Module):
     """2-D Convolutional model component, with option for max-pooling vs
     downsampling for strides > 1.  Requires number of input channels, but
@@ -1537,7 +1537,7 @@ class Conv2dModel(torch.nn.Module):
 
 ###### 2.`Conv2dHeadModel`
 
-```Python
+``` python
 class Conv2dHeadModel(torch.nn.Module):
     """Model component composed of a ``Conv2dModel`` component followed by 
     a fully-connected ``MlpModel`` head.  Requires full input image shape to
@@ -1568,7 +1568,7 @@ This is useful in contexts such as **evaluation/inference**, where deterministic
 
 ###### 1.`DeterministicPolicyMixin`
 
-```Python
+``` python
 class DeterministicPolicyMixin:
     def act(self, *args, **kwargs):
         return_ = super().act(*args, **kwargs)
@@ -1597,7 +1597,7 @@ It also provides concrete combined classes (`EncoderActorCritic`, `EncoderActorC
 
 ###### 1.EncoderActorCriticMixin
 
-```Python
+``` python
 class EncoderActorCriticMixin:
     """ A general implementation where a seperate encoder is used to embed the obs/privileged_obs """
 ```
@@ -1610,7 +1610,7 @@ class EncoderActorCriticMixin:
   - `encoder_kwargs`: encoder hyperparameters (hidden sizes, etc.).
   - `critic_encoder_component_names`: separate encoder(s) for critic input, or `"shared"` to reuse actor encoders.
 
-```Python
+``` python
 def prepare_obs_slices(self):
     self.encoder_obs_slices = [get_obs_slice(self.obs_segments, name) for name in self.encoder_component_names]
     ...
@@ -1618,28 +1618,28 @@ def prepare_obs_slices(self):
 
 - Computes observation slices for each encoder input. Ensures that latent embeddings are inserted in the correct order when reconstructing the observation vector.
 
-```Python
+``` python
 def build_encoders(self, component_names, class_name, obs_slices, kwargs, encoder_output_size):
     ...
 ```
 
 - Builds encoder modules (MLP or Conv2D) for each specified observation segment.
 
-```Python
+``` python
 def embed_encoders_latent(self, observations, obs_slices, encoders, latents_order):
     ...
 ```
 
 - Applies encoders to the respective observation slices, replaces them with latent vectors, and concatenates back into a full observation vector.
 
-```Python
+``` python
 def get_encoder_latent(self, observations, obs_component, critic=False):
     ...
 ```
 
 - Retrieves the latent representation for a **specific observation component** (useful for debugging or specialized processing).
 
-```Python
+``` python
 def act(self, observations, **kwargs): ...
 def act_inference(self, observations): ...
 def evaluate(self, critic_observations, ...): ...
@@ -1652,7 +1652,7 @@ def evaluate(self, critic_observations, ...): ...
 
 ###### 2.Combined Classes
 
-```Python
+``` python
 class EncoderActorCritic(EncoderActorCriticMixin, ActorCritic): pass
 class EncoderActorCriticRecurrent(EncoderActorCriticMixin, ActorCriticRecurrent): pass
 class EncoderAmpActorCriticRecurrent(EncoderActorCriticMixin, AmpActorCriticRecurrent): pass
@@ -1686,7 +1686,7 @@ This module defines a **Multilayer Perceptron** **(****MLP****)** model as a reu
 
 ###### `MlpModel`
 
-```Python
+``` python
 class MlpModel(torch.nn.Module):
     """Multilayer Perceptron with last layer linear."""
 ```
@@ -1740,7 +1740,7 @@ This module provides different strategies for **normalizing data** in reinforcem
 
 ###### 1.`EmpiricalNormalization`
 
-```Python
+``` python
 class EmpiricalNormalization(nn.Module):
     """Normalize mean and variance of values based on empirical values."""
 ```
@@ -1758,7 +1758,7 @@ class EmpiricalNormalization(nn.Module):
 
 ###### 2.`Normalize`
 
-```Python
+``` python
 class Normalize(torch.nn.Module):
     """Wrapper around torch.nn.functional.normalize (L2 norm)."""
 ```
@@ -1770,7 +1770,7 @@ class Normalize(torch.nn.Module):
 
 ###### 3.`RunningMeanStd`
 
-```Python
+``` python
 class RunningMeanStd(object):
     """Tracks running mean and variance of a data stream."""
 ```
@@ -1791,7 +1791,7 @@ class RunningMeanStd(object):
 
 ###### 4.`Normalizer`
 
-```Python
+``` python
 class Normalizer(RunningMeanStd):
     """Extends RunningMeanStd with clipping and PyTorch support."""
 ```
@@ -1835,7 +1835,7 @@ This module introduces an **actor-critic extension with privileged state estimat
 
 ###### 1.`AdaptorActorHiddenState`
 
-```Python
+``` python
 AdaptorActorHiddenState = namedarraytuple('AdaptorActorHiddenState', ['adaptor', 'actor'])
 ```
 
@@ -1844,7 +1844,7 @@ AdaptorActorHiddenState = namedarraytuple('AdaptorActorHiddenState', ['adaptor',
 
 ###### 2.`PrivilegeEstimatorMixin`
 
-```Python
+``` python
 class PrivilegeEstimatorMixin:
     """Adds a state adaptor module for estimating privileged state features."""
 ```
@@ -1875,7 +1875,7 @@ class PrivilegeEstimatorMixin:
 
 ###### 3.`PrivilegeStateAcRecurrent`
 
-```Python
+``` python
 class PrivilegeStateAcRecurrent(PrivilegeEstimatorMixin, EstimatorMixin, ActorCriticRecurrent):
     pass
 ```
@@ -1927,7 +1927,7 @@ This module introduces an **actor-critic extension with an internal state estima
 
 ###### 1.`EstimatorActorHiddenState`
 
-```Python
+``` python
 EstimatorActorHiddenState = namedarraytuple('EstimatorActorHiddenState', ['estimator', 'actor'])
 ```
 
@@ -1936,7 +1936,7 @@ EstimatorActorHiddenState = namedarraytuple('EstimatorActorHiddenState', ['estim
 
 ###### 2.`EstimatorMixin`
 
-```Python
+``` python
 class EstimatorMixin:
     """Adds a learned state estimator to Actor-Critic."""
 ```
@@ -1968,7 +1968,7 @@ class EstimatorMixin:
 
 ###### 3.`StateAc`
 
-```Python
+``` python
 class StateAc(EstimatorMixin, ActorCritic):
     pass
 ```
@@ -1979,7 +1979,7 @@ Suitable when observations are fully available per timestep (no need for recurre
 
 4.`StateAcRecurrent`
 
-```Plain
+``` bash
 class StateAcRecurrent(EstimatorMixin, ActorCriticRecurrent):
     pass
 ```
@@ -2037,14 +2037,14 @@ This module provides utility functions to support model construction:
 
 - `get_activation_Cls` is useful when models are defined from config files with activation specified as strings.
 
-```Plain
+``` bash
 act_cls = get_activation_Cls("relu")
 activation = act_cls()   # instantiate
 ```
 
 - `conv2d_output_shape` helps design CNNs without hardcoding dimensions.
 
-```Plain
+``` bash
 h, w = conv2d_output_shape(64, 64, kernel_size=3, stride=2, padding=1)
 print(h, w)  # → (32, 32)
 ```
@@ -2092,7 +2092,7 @@ This module extends the Actor-Critic framework to handle **visual observations**
 - To use with visual input, ensure `obs_segments` includes a component (e.g., `"forward_depth"`) matching `visual_component_name`.
 - Example:
 
-```Plain
+``` bash
 model = VisualDeterministicAC(
     num_actor_obs=512,
     num_critic_obs=512,
@@ -2117,7 +2117,7 @@ actions = model.act(observations)
 
 ##### Definition
 
-```Python
+``` python
 class AmpPolicyRunner(OnPolicyRunner):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -2129,7 +2129,7 @@ class AmpPolicyRunner(OnPolicyRunner):
 
 ####  Core Method: `learn`
 
-```Python
+``` python
 def learn(self, num_learning_iterations, init_at_random_ep_len=False, trial=None):
 ```
 
@@ -2143,7 +2143,7 @@ def learn(self, num_learning_iterations, init_at_random_ep_len=False, trial=None
 
 1.Writer & Observation Initialization
 
-```Python
+``` python
 self.init_writter(init_at_random_ep_len)
 obs, extras = self.env.get_observations()
 critic_obs = extras["observations"].get("critic", obs)
@@ -2156,7 +2156,7 @@ critic_obs = extras["observations"].get("critic", obs)
 
 2.Switch to Training Mode
 
-```Python
+``` python
 self.train_mode()
 ```
 
@@ -2164,7 +2164,7 @@ self.train_mode()
 
 3.Buffers Setup
 
-```Python
+``` python
 ep_infos = []
 rframebuffer = deque(maxlen=2000)
 rewbuffer = deque(maxlen=100)
@@ -2182,13 +2182,13 @@ cur_episode_length = torch.zeros(self.env.num_envs, ...)
 
 4.Main Training Loop
 
-```Python
+``` python
 for it in range(start_iter, tot_iter):
 ```
 
 (1) Rollout Phase
 
-```Python
+``` python
 with torch.inference_mode(self.cfg.get("inference_mode_rollout", True)):
     for i in range(self.num_steps_per_env):
         obs, critic_obs, rewards, dones, infos = self.rollout_step(obs, critic_obs)
@@ -2200,7 +2200,7 @@ with torch.inference_mode(self.cfg.get("inference_mode_rollout", True)):
 
 (2) Learning Phase
 
-```Python
+``` python
 self.alg.compute_returns(critic_obs)
 losses, stats = self.alg.update(self.current_learning_iteration)
 ```
@@ -2210,7 +2210,7 @@ losses, stats = self.alg.update(self.current_learning_iteration)
 
 (3) Evaluation
 
-```Python
+``` python
 self.evaluation()
 if trial is not None:
     trial.report(self.metrics_velrmsd, self.current_learning_iteration)
@@ -2221,7 +2221,7 @@ if trial is not None:
 
 (4) Logging & Saving
 
-```Python
+``` python
 if self.log_dir is not None and self.current_learning_iteration % self.log_interval == 0:
     self.log(locals())
 if self.current_learning_iteration % self.save_interval == 0:
@@ -2233,7 +2233,7 @@ if self.current_learning_iteration % self.save_interval == 0:
 
 (5) Code State Archiving
 
-```Python
+``` python
 if it == start_iter:
     git_file_paths = store_code_state(self.log_dir, self.git_status_repos)
 ```
@@ -2243,7 +2243,7 @@ if it == start_iter:
 
 5.Final Save
 
-```Python
+``` python
 self.save(os.path.join(self.log_dir, 'model_{}.pt'.format(self.current_learning_iteration)))
 ```
 
@@ -2251,7 +2251,7 @@ self.save(os.path.join(self.log_dir, 'model_{}.pt'.format(self.current_learning_
 
 #### Example Usage
 
-```Python
+``` python
 from st_rl.runners.amp_policy_runner import AmpPolicyRunner
 from st_rl.env import VecEnv
 import st_rl.algorithms as algorithms
@@ -2278,7 +2278,7 @@ print("Final metrics:", runner.metrics_velrmsd, runner.metrics_CoT)
 
 ##### Definition
 
-```Python
+``` python
 class DaggerSaver(DemonstrationSaver):
     """This demonstration saver will rollout the trajectory by running the student policy
     (with a probability) and label the trajectory by running the teacher policy."""
@@ -2292,7 +2292,7 @@ class DaggerSaver(DemonstrationSaver):
 
 #### Constructor (`init`)
 
-```Python
+``` python
 def __init__(..., 
              training_policy_logdir, 
              teacher_act_prob="exp", 
@@ -2319,7 +2319,7 @@ def __init__(...,
 
 ##### 1.`init_traj_handlers`
 
-```Python
+``` python
 def init_traj_handlers(self):
     self.metadata["training_policy_logdir"] = ...
     self.build_training_policy()
@@ -2330,7 +2330,7 @@ def init_traj_handlers(self):
 
 ##### 2. `init_storage_buffer`
 
-```Python
+``` python
 def init_storage_buffer(self):
     self.rollout_episode_infos = []
 ```
@@ -2340,7 +2340,7 @@ def init_storage_buffer(self):
 
 ##### 3. `build_training_policy`
 
-```Python
+``` python
 def build_training_policy(self):
     with open(.../config.json) as f:
         config = json.load(f)
@@ -2354,7 +2354,7 @@ def build_training_policy(self):
 
 ##### 4. `load_latest_training_policy`
 
-```Python
+``` python
 def load_latest_training_policy(self):
     models = [file for file in os.listdir(self.training_policy_logdir) if 'model' in file]
     ...
@@ -2368,7 +2368,7 @@ def load_latest_training_policy(self):
 
 ##### 5. `get_transition`
 
-```Python
+``` python
 def get_transition(self):
     teacher_actions = self.get_policy_actions()
     actions = self.training_policy.act(self.obs)
@@ -2384,7 +2384,7 @@ def get_transition(self):
 
 ##### 6. `add_transition`
 
-```Python
+``` python
 def add_transition(self, step_i, infos):
     if "episode" in infos:
         self.rollout_episode_infos.append(infos["episode"])
@@ -2394,7 +2394,7 @@ def add_transition(self, step_i, infos):
 
 ##### 7. `policy_reset`
 
-```Python
+``` python
 def policy_reset(self, dones):
     if dones.any():
         self.training_policy.reset(dones)
@@ -2404,7 +2404,7 @@ def policy_reset(self, dones):
 
 ##### 8. `check_stop`
 
-```Python
+``` python
 def check_stop(self):
     self.load_latest_training_policy()
     return super().check_stop()
@@ -2415,7 +2415,7 @@ def check_stop(self):
 
 ##### 9. `print_log`
 
-```Python
+``` python
 def print_log(self):
     for key in self.rollout_episode_infos[0].keys():
         ...
@@ -2430,7 +2430,7 @@ def print_log(self):
 
 ####  Example Usage
 
-```Python
+``` python
 from st_rl.datasets.dagger_saver import DaggerSaver
 
 # Initialize saver
@@ -2542,7 +2542,7 @@ Main class that orchestrates **on-policy RL training**.
 
 **Constructor**
 
-```Python
+``` python
 def __init__(self, env: VecEnv, train_cfg, log_dir=None, device="cpu")
 ```
 
@@ -2559,7 +2559,7 @@ Responsibilities:
 
 ##### 🔹 `init_writer`
 
-```Python
+``` python
 def init_writter(self, init_at_random_ep_len: bool)
 ```
 
@@ -2568,7 +2568,7 @@ def init_writter(self, init_at_random_ep_len: bool)
 
 ##### 🔹 `learn`
 
-```Python
+``` python
 def learn(self, num_learning_iterations, init_at_random_ep_len=False, trial=None)
 ```
 
@@ -2586,7 +2586,7 @@ Returns:
 
 ##### 🔹 `evaluation`
 
-```Python
+``` python
 def evaluation(self)
 ```
 
@@ -2596,7 +2596,7 @@ def evaluation(self)
 
 ##### 🔹 `rollout_step`
 
-```Python
+``` python
 def rollout_step(self, obs, critic_obs, **kwargs)
 ```
 
@@ -2608,7 +2608,7 @@ def rollout_step(self, obs, critic_obs, **kwargs)
 
 ##### 🔹 `log`
 
-```Python
+``` python
 def log(self, locs, width=80, pad=35)
 ```
 
@@ -2620,7 +2620,7 @@ def log(self, locs, width=80, pad=35)
 
 ##### 🔹 `save`
 
-```Python
+``` python
 def save(self, path: str, infos=None)
 ```
 
@@ -2631,7 +2631,7 @@ def save(self, path: str, infos=None)
 
 ##### 🔹 `load`
 
-```Python
+``` python
 def load(self, path, load_optimizer=True, map_location=None)
 ```
 
@@ -2641,7 +2641,7 @@ def load(self, path, load_optimizer=True, map_location=None)
 
 ##### 🔹 `get_inference_policy`
 
-```Python
+``` python
 def get_inference_policy(self, device=None)
 ```
 
@@ -2655,7 +2655,7 @@ def get_inference_policy(self, device=None)
 
 ##### 🔹 Git Tracking
 
-```Python
+``` python
 def add_git_repo_to_log(self, repo_file_path)
 ```
 
@@ -2698,7 +2698,7 @@ Behavior:
 
   - Fetch a batch from the demonstration dataset:
 
-  - ```Python
+  - ``` python
     transition, infos = self.rollout_dataset.get_transition_batch()
     ```
 
@@ -2708,7 +2708,7 @@ Behavior:
 
     1. Feed it into the algorithm:
 
-    2. ```Python
+    2. ``` python
        self.alg.collect_transition_from_dataset(transition, infos)
        ```
 
@@ -2720,7 +2720,7 @@ Behavior:
 
 - **If outside pretraining:** Falls back to standard RL rollout:
 
-```Python
+``` python
 return super().rollout_step(obs, critic_obs)
 ```
 
@@ -2747,7 +2747,7 @@ return super().rollout_step(obs, critic_obs)
 
 #### **Constructor:** **`init`**
 
-```Python
+``` python
 def __init__(self, obs_dim, buffer_size, device):
     self.states = torch.zeros(buffer_size, obs_dim).to(device)
     self.next_states = torch.zeros(buffer_size, obs_dim).to(device)
@@ -2773,7 +2773,7 @@ def __init__(self, obs_dim, buffer_size, device):
 
 ####  **Method:** **`insert`**
 
-```Python
+``` python
 def insert(self, states, next_states):
     num_states = states.shape[0]
     start_idx = self.step
@@ -2799,7 +2799,7 @@ Insert a batch of states and their corresponding next states into the buffer.
 
 #### **Method:** **`feed_forward_generator`**
 
-```Python
+``` python
 def feed_forward_generator(self, num_mini_batch, mini_batch_size):
     for _ in range(num_mini_batch):
         sample_idxs = np.random.choice(self.num_samples, size=mini_batch_size)
@@ -2953,7 +2953,7 @@ It’s designed as a **template** — real implementations (subclasses) must imp
 
 #####  **Constructor**
 
-```Python
+``` python
 def __init__(self, data_dir, num_envs, dataset_loops=1, random_shuffle_traj_order=False, keep_latest_n_trajs=0, starting_frame_range=[0, 1], device="cuda"):
 ```
 
