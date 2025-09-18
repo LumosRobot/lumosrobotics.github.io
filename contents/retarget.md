@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Data retarget
+title: Trajectory Alignment
 nav_enabled: true
 nav_order: 4
 ---
@@ -8,6 +8,9 @@ nav_order: 4
 
 
 This guide will walk you through the process of retargeting human motion capture data  to a humanoid robot model.
+
+You can follow along using the code available in our [GitHub repository](https://github.com/LumosRobot/humanoid_demo_retarget).
+
 
 # Chapter 1. Environment Setup
 

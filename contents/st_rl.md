@@ -1,11 +1,13 @@
 ---
 layout: default
-title: RL Algorithm Code
+title: St Rl
 nav_enabled: true
 nav_order: 6
 ---
 
 # st_rl
+You can follow along using the code available in our [GitHub repository](https://github.com/LumosRobot/st_rl).
+
 
 ## algorithms
 
@@ -2969,13 +2971,13 @@ def __init__(self, data_dir, num_envs, dataset_loops=1, random_shuffle_traj_orde
 
 #####  **Data Reading & Preparation**
 
-```
+``` python
 get_frame_range(filename)
 ```
 
 - Extracts frame index range `(start, end)` from filename (e.g., `"traj_100_200.pkl"` → `(100, 200)`).
 
-```
+``` python
 read_dataset_directory()
 ```
 
@@ -2985,7 +2987,7 @@ read_dataset_directory()
 - Keeps track of unused trajectories and supports random shuffling.
 - Returns `True` if enough data exists, otherwise waits.
 
-```
+``` python
 assemble_obs_components(traj_data)
 ```
 
@@ -2994,7 +2996,7 @@ assemble_obs_components(traj_data)
 
 ##### **Handler Management**
 
-```
+``` python
 reset_all()
 ```
 
@@ -3003,7 +3005,7 @@ reset_all()
 - Initializes tracking structures for each environment: identifiers, file names, lengths, cursors, etc.
 - Calls `refresh_handlers()` to assign initial trajectories.
 
-```
+``` python
 _refresh_traj_data(env_idx)
 ```
 
@@ -3011,7 +3013,7 @@ _refresh_traj_data(env_idx)
 - Converts numpy arrays → PyTorch tensors (on `device`).
 - Optionally reconstructs observations from compressed components.
 
-```
+``` python
 _refresh_traj_handler(env_idx)
 ```
 
@@ -3020,14 +3022,14 @@ _refresh_traj_handler(env_idx)
 - Ensures the cursor is within a valid file.
 - Marks the first frame as `done=True`.
 
-```
+``` python
 refresh_handlers(env_ids)
 ```
 
 - Refreshes trajectory handlers for selected envs.
 - Assigns unused trajectory IDs to them.
 
-```
+``` python
 _maintain_handler(env_idx)
 ```
 
@@ -3037,7 +3039,7 @@ _maintain_handler(env_idx)
 
 ##### **Buffer & Transition Filling**
 
-```
+``` python
 get_buffer(num_transitions_per_env=None)
 ```
 
@@ -3045,7 +3047,7 @@ get_buffer(num_transitions_per_env=None)
 - Pre-allocates tensors for efficiency (observations, actions, rewards, dones, etc.).
 - Supports both single-step and multi-step (time-major) format.
 
-```
+``` python
 _fill_transition_per_env(buffer, env_idx)
 ```
 
@@ -3056,7 +3058,7 @@ _fill_transition_per_env(buffer, env_idx)
   - Loading next trajectory when current is exhausted.
 - Ensures **next_observation** is also filled.
 
-```
+``` python
 fill_transition(buffer, env_ids=None)
 ```
 

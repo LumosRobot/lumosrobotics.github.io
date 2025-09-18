@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Models
+title: Robot Models
 nav_enabled: true
 nav_order: 2
 ---

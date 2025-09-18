@@ -1,9 +1,11 @@
 ---
 layout: default
-title: RL Env Code
+title: St Gym
 nav_enabled: true
 nav_order: 5
 ---
+You can follow along using the code available in our [GitHub repository](https://github.com/LumosRobot/st_gym).
+
 
 # 1. Key Features:
 
