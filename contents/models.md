@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Models
-nav_enabled: 2
+nav_order: 2
 ---
 
 # Robots
