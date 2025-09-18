@@ -1,6 +1,7 @@
 ---
-title: Home
+title: Overview
 layout: home
+nav_order: 1
 ---
 
 Lumos RL Workspace is a modular reinforcement learning framework for legged locomotion, designed around the Lus and NIX humanoid robots.

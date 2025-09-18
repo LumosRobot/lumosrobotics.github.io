@@ -2,6 +2,7 @@
 layout: default
 title: Overview
 nav_enabled: true
+nav_order: 3
 ---
 
 This chapter provides an overview of the two core projects in Lumos RL Workspace.Before diving into the details, the following diagram illustrates the relationship between the main components and their interactions:

@@ -13,6 +13,9 @@ plugins:
   - jekyll-default-layout
 
 
+just-the-docs:
+  nav_sort: nav_order # 按 nav_order 排序
+
 # Enable or disable the site search
 # Supports true (default) or false
 search_enabled: true
