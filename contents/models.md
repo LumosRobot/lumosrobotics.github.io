@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Models
-nav_enabled: true
+nav_enabled: 2
 ---
 
 # Robots
@@ -21,9 +21,15 @@ Both robots are modeled with high-fidelity physics, including joint limits, actu
 - Degrees of Freedom (DoF): 28
 - Actuators: Position–torque actuators with compliant control
 
-![Lus2](../assets/figures/lus2.png)
+<div align="center">
+  <img src="../assets/figures/lus2.png" alt="Lus2" width="600"/>
+  <p><b>Figure : Lus2 Joint Limits (in Radians, left side example)</b></p>
+</div>
 
-![Lus2](../assets/figures/lus2_urdf.png)
+<div align="center">
+  <img src="../assets/figures/lus2_urdf.png" alt="Lus2 urdf" width="600"/>
+  <p><b>Figure : Lus2  skeleton tree</b></p>
+</div>
 
 
 
@@ -34,6 +40,12 @@ Both robots are modeled with high-fidelity physics, including joint limits, actu
 - Degrees of Freedom (DoF): 21
 - Actuators: Hybrid position–torque actuators with higher torque limits
 
-![Lus2](../assets/figures/nix_structure.png)
+<div align="center">
+  <img src="../assets/figures/nix_structure.png" alt="nix_structure" width="600"/>
+  <p><b>Figure : Nix1 Overall Dimension Diagram</b></p>
+</div>
 
-![Lus2](../assets/figures/nix_urdf.png)
+<div align="center">
+  <img src="../assets/figures/nix_urdf.png" alt="nix urdf" width="600"/>
+  <p><b>Figure : Nix1 skeleton tree</b></p>
+</div>

@@ -24,48 +24,7 @@ Using this guide, you will be able to  retarget human motions, train locomotion 
   <p><b>Figure: Motion Retargeting and Real-World Deploymentt</b></p>
 </div>
 
-# Chapter 2. Robot Models
-## 2.1 Supported Robots
-This chapter introduces the robot platforms currently supported in Lumos RL Workspace.Lumos RL Workspace currently supports two humanoid robots: Lus2 and Nix1.
-Both robots are described using modular configuration files and URDF/XML models, including detailed kinematics, joint limits, actuator properties, and mass distributions to ensure smooth simulation and accurate sim-to-real transfer. These resources are stored under the robot_models/ directory.
-- Currently available models
-  - Lus2: Full-sized humanoid robot
-  - NIX1: Small-sized humanoid robot
-Both robots are modeled with high-fidelity physics, including joint limits, actuator properties, and accurate mass distribution. This ensures realistic training dynamics and smoother transfer to real hardware.
-## 2.2 Device details
-Lus2
-- Height:  1.6 m
-- Weight:  57 kg
-- Degrees of Freedom (DoF): 28
-- Actuators: Position–torque actuators with compliant control
-
-<div align="center">
-  <img src="assets/figures/lus2.png" alt="Lus2" width="600"/>
-  <p><b>Figure : Lus2 Joint Limits (in Radians, left side example)</b></p>
-</div>
-
-<div align="center">
-  <img src="assets/figures/lus2_urdf.png" alt="Lus2 urdf" width="600"/>
-  <p><b>Figure : Lus2  skeleton tree</b></p>
-</div>
-
-Nix1
-- Height: 0.886m
-- Weight: 18 kg
-- Degrees of Freedom (DoF): 21
-- Actuators: Hybrid position–torque actuators with higher torque limits
-
-<div align="center">
-  <img src="assets/figures/nix_structure.png" alt="nix_structure" width="600"/>
-  <p><b>Figure : Nix1 Overall Dimension Diagram</b></p>
-</div>
-
-<div align="center">
-  <img src="assets/figures/nix_urdf.png" alt="nix urdf" width="600"/>
-  <p><b>Figure : Nix1 skeleton tree</b></p>
-</div>
-
-# Chapter 3.  Projects
+# Chapter 2.  Projects
 This chapter provides an overview of the two core projects in Lumos RL Workspace.Before diving into the details, the following diagram illustrates the relationship between the main components and their interactions:
 <div align="center">
   <img src="assets/figures/Project_Relationship_Diagram.png" alt="nix urdf" width="600"/>
@@ -76,10 +35,10 @@ Each project has its own subpage with two parts:
 1. Getting Started – Step-by-step guide for running demos and training policies.
 2. Concepts & Principles – Technical details, mathematical background, and design philosophy.
 Additional documentation will be added here progressively.
-Setup
 
 
-## 3.1 Trajectory Alignment
+
+## 2.1 Trajectory Alignment
   from human motions to Lus2 & Nix1
 - Focus: Motion retargeting from human trajectories to Lus2 and Nix1.
 - Provides tools for trajectory alignment and dataset preprocessing.
@@ -91,7 +50,7 @@ Example Result Video: Retargeted human motion trajectory executed on Lus2.
   <p><b>Figure: Comparison of Retargeted Motion (CMU_CMU_13_13_21_poses)</b></p>
 </div>
 
-## 3.2 Policy Training
+## 2.2 Policy Training
 - Focus: Reinforcement learning–based policy for humanoid robots.
 - Framework: Built on st_gym (Isaac Sim–based environments) and st_rl (RL algorithms).
 - Key Features:
