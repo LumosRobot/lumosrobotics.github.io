@@ -8,22 +8,19 @@ nav_order: 7
 # 1. Environment Registration Flow
 st_gym's environment registration follows the following process：
 <div align="center">
-  <img src="../assets/figures/Environment Registration Flow.PNG" alt="Registration" width="600"/>
+  <img src="../assets/figures/Environment Registration Flow.PNG" alt="Registration" width="800"/>
 </div>
 
 # 2. Train Workflow
 <div align="center">
-  <img src="../assets/figures/Train Workflow.PNG" alt="Train Workflow" width="600"/>
+  <img src="../assets/figures/Train Workflow.PNG" alt="Train Workflow" width="900"/>
 </div>
 
 # 3. Robot-Specific Configuration
-| Configuration Aspect      | Base Configuration                     | Robot-Specific Adjustment                           |
-|---------------------------|---------------------------------------|---------------------------------------------------|
-| Robot Model / Asset       | Generic articulation                   | Specify the exact robot model path               |
-| Action Scale              | Default Scale                          | Adjust according to the robot’s joint/motor characteristics |
-| Reward Weights            | Default                                | Tailor to emphasize robot-specific behaviors or priorities |
-| Body Part Names           | Generic naming patterns                 | Update to reflect specific robot links/joints   |
-| Command Ranges            | Default velocity/angular ranges        | Modify to match the robot’s locomotion capabilities |
+
+<div align="center">
+  <img src="../assets/figures/ Robot-Specific_Configuration_table.png" alt="Robot-Specific_Configuration_table" width="900"/>
+</div>
 
 
 ## 3.1 Robot Model
