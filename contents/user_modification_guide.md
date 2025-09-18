@@ -9,11 +9,13 @@ nav_order: 7
 st_gym's environment registration follows the following process：
 <div align="center">
   <img src="../assets/figures/Environment Registration Flow.PNG" alt="Registration" width="800"/>
+   <p><b>Figure:  Environment Registration Flow</b></p>
 </div>
 
 # 2. Train Workflow
 <div align="center">
   <img src="../assets/figures/Train Workflow.PNG" alt="Train Workflow" width="900"/>
+  <p><b>Figure:  Train Workflow</b></p>
 </div>
 
 # 3. Robot-Specific Configuration

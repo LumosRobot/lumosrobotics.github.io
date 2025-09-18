@@ -24,7 +24,7 @@ st_gym
 │       │   ├── tasks/               # Task configurations (env, agents, AMP, etc.)
 │       │   │   ├── config/          
 │       │   │   │   └── lus2/        # lus2 task configuration
-│       │   │   ├── mdp/             # RL MDP components (actions, commands, curriculums, events, observations, rewards, terminations)
+│       │   │   ├── mdp/             # RL MDP components (actions,observations,rewards,etc.)
 │       │   │   └── utils/           # Utilities and wrappers (logger, wrappers)
 │       │   └── tests/               # Unit tests
 │       └── setup.py                 # Module installation entry

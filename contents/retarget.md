@@ -13,7 +13,7 @@ This guide will walk you through the process of retargeting human motion capture
 
 ## 1.1 Create a Conda Environment
 
-```Python
+``` python
 # Create environment
 conda create -n retarget python=3.8
 
@@ -23,7 +23,7 @@ conda activate retarget
 
 ## 1.2 Install dependencies
 
-```Python
+``` python
 # Install PyTorch with CUDA
 conda install pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
 
@@ -48,7 +48,7 @@ Download the[SMPL](https://smpl.is.tue.mpg.de/)  **v1.1.0** model parameters and
 
 Expected directory:
 
-```Python
+``` python
 |-- data
     |-- smpl
         |-- SMPL_FEMALE.pkl
@@ -99,7 +99,7 @@ This chapter explains how to run motion retargeting demos in **two ways**:
 
 Before starting, navigate to the project root directory:
 
-```Python
+``` python
 cd sources/
 ```
 
@@ -165,7 +165,7 @@ Instead of running multiple Python scripts manually, Lumos RL Workspace provides
 
 - **Shape Fitting**
 
-```Python
+``` python
 ./run.sh -r lumos_lus2_joint27 -s
 ```
 
@@ -175,7 +175,7 @@ Instead of running multiple Python scripts manually, Lumos RL Workspace provides
 
 - **Motion Retargeting**
 
-```Python
+``` python
 ./run.sh -r lumos_lus2_joint21 -f -m CMU_CMU_13_13_21_poses
 ```
 
@@ -185,7 +185,7 @@ Instead of running multiple Python scripts manually, Lumos RL Workspace provides
 
 - **Visualization**
 
-```Python
+``` python
 ./run.sh -r lumos_lus2_joint27 -v -m CMU_CMU_13_13_21_poses
 ```
 
@@ -193,7 +193,7 @@ Instead of running multiple Python scripts manually, Lumos RL Workspace provides
 
 - **Full Pipeline (Recommended)**
 
-```Python
+``` python
 ./run.sh -r lumos_lus2_joint27 -s -f -v -m CMU_CMU_13_13_21_poses
 ```
 
@@ -211,7 +211,7 @@ This one-line command is recommended for running the entire process end-to-end.
 
 Flags can be combined in any order:
 
-```Python
+``` python
 ./run.sh -r lumos_lus2_joint27 -sfvm CMU_CMU_13_13_21_poses
 ./run.sh -r lumos_lus2_joint27 -vsf -m CMU_CMU_13_13_21_poses
 ```
@@ -263,7 +263,7 @@ Keyboard shortcuts for **MuJoCo viewer** during playback:
 
 # Acknowledgements
 
-This project builds upon the **PHC (Perpetual Humanoid Control)** framework.
+This project builds upon the  [**PHC (Perpetual Humanoid Control)**](https://github.com/ZhengyiLuo/PHC) framework.
 
 If you find this work useful for your research, please consider citing:
 
