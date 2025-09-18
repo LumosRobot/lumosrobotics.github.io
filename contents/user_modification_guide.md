@@ -6,7 +6,7 @@ nav_order: 7
 ---
 
 # 1. Environment Registration Flow
-st_gym's environment registration follows the following process：
+` st_gym`'s environment registration follows the following process：
 <div align="center">
   <img src="../assets/figures/Environment Registration Flow.PNG" alt="Registration" width="800"/>
    <p><b>Figure:  Environment Registration Flow</b></p>
@@ -37,7 +37,7 @@ Lus2_Joint21_CFG.spawn.usd_path = f"{usd_dir_path}/lus2/usd/lus2_joint21.usd"
 ```
 
 ## 3.2 Reward Weights & Command Ranges
-For detailed parameters, refer to RL Env Code Configuration and modify them according to different tasks.
+For detailed parameters, refer to St Gym Configuration and modify them according to different tasks.
 
 ## 3.3 Action Scale:
 Default: scale=0.25 

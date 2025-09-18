@@ -118,11 +118,11 @@ Task rewards
 | track_ang_vel_z_exp   | Reward for tracking target angular velocity around Z axis    | 2.0         |
 | feet_air_time         | Reward for swing foot airtime                                | 0.8         |
 | feet_slide            | Penalty for sliding feet                                     | -1.0        |
-| joint_deviation_hip   | Penalize deviation from default of the joints that are not essential for locomotion | -0.1        |
-| joint_deviation_feet  | -0.1                                                         |             |
-| joint_deviation_arms  | -0.1                                                         |             |
-| joint_deviation_wrist | -0.2                                                         |             |
-| joint_deviation_torso | -0.1                                                         |             |
+| joint_deviation_hip   | Penalize deviation of hip joint from nominal posture         | -0.1        |
+| joint_deviation_feet  | Penalize deviation of feet joint from nominal posture        | -0.1        |
+| joint_deviation_arms  | Penalize deviation of arms joint from nominal posture        | -0.1        |
+| joint_deviation_wrist | Penalize deviation of wrist joint from nominal posture       | -0.2        |
+| joint_deviation_torso | Penalize deviation of torso joint from nominal posture       | -0.1        |
 | energy_cost           | Penalize energy consumption                                  | -2.0e-7     |
 | feet_parallel_v1      | Reward for keeping feet parallel                             | 1.0         |
 | undesired_contacts    | Penalize undesired body-ground contacts                      | -20.0       |
