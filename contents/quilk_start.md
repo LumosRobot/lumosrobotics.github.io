@@ -200,6 +200,12 @@ st_gym/logs/st_rl/lus2_flat/yyyy-mm-dd_hh-mm-ss/exported/policy.onnx
 
 ## Sim2Sim (MuJoCo)
 
+You need to install the required dependencies before running Mujoco by executing:
+``` bash
+pip install mujoco
+pip install onnxruntime
+```
+
 Replay with MuJoCo using python:
 
 ``` bash
