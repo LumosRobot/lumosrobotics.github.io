@@ -1,3 +1,10 @@
+---
+title: algorithms
+parent: St Rl
+nav_enabled: true
+nav_order: 1
+---
+
 # algorithms
 
 ## 1.ppo.py

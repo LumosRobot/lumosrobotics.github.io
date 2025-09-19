@@ -1,3 +1,10 @@
+---
+title: modules
+parent: St Rl
+nav_enabled: true
+nav_order: 2
+---
+
 # modules
 
 ## 1.actor_critic.py
